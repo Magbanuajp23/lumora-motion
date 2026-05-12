@@ -1,5 +1,7 @@
-import { Loader2 } from "lucide-react";
+import { Activity, AudioWaveform, Captions, Loader2, ScanSearch, Sparkles, Wand2, Zap } from "lucide-react";
 import { processingSteps } from "@/lib/lumora-motion-data";
+
+const stepIcons = [ScanSearch, Sparkles, AudioWaveform, Captions, Activity, Wand2, Zap];
 
 export function ProcessingPanel({
   isGenerating,
@@ -44,12 +46,18 @@ export function ProcessingPanel({
       </div>
       <div className="mt-6 space-y-3">
         {processingSteps.map((title, index) => {
+          const Icon = stepIcons[index] ?? Activity;
           const complete = activeStep > index || (!isGenerating && activeStep === processingSteps.length - 1);
           const active = isGenerating && activeStep === index;
           return (
             <div key={title} className={`rounded-xl border p-4 transition duration-300 ${active ? "border-plasma/50 bg-plasma/10 shadow-glow" : complete ? "border-signal/25 bg-signal/[0.06]" : "border-white/10 bg-white/[0.035]"}`}>
               <div className="flex items-center justify-between gap-3">
-                <span className="font-semibold text-white">{title}</span>
+                <span className="inline-flex min-w-0 items-center gap-3 font-semibold text-white">
+                  <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl border ${active ? "border-plasma/40 bg-plasma/15" : "border-white/10 bg-black/20"}`}>
+                    <Icon className="h-4 w-4 text-plasma" aria-hidden="true" />
+                  </span>
+                  <span className="truncate">{title}</span>
+                </span>
                 <span className="text-sm text-slate-400">{active ? "processing" : complete ? "complete" : "queued"}</span>
               </div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">

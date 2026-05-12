@@ -1,14 +1,16 @@
 import Image from "next/image";
-import { Play, Radio, Sparkles, Wand2 } from "lucide-react";
-import { brand } from "@/lib/lumora-motion-data";
+import { AudioWaveform, Clapperboard, Play, Radio, Sparkles, Wand2, Zap } from "lucide-react";
+import { brand, creatorStats } from "@/lib/lumora-motion-data";
 
 export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
   return (
-    <section id="home" className="relative mx-auto grid min-h-[calc(100vh-72px)] w-full max-w-7xl items-center gap-8 overflow-x-hidden px-4 py-10 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
+    <section id="home" className="relative mx-auto grid min-h-[calc(100vh-72px)] w-full max-w-7xl items-center gap-8 overflow-hidden px-4 py-10 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
+      <div className="pointer-events-none absolute left-1/2 top-8 h-72 w-72 -translate-x-1/2 rounded-full bg-plasma/10 blur-3xl sm:h-[34rem] sm:w-[34rem]" />
+      <div className="particle-field pointer-events-none absolute inset-0 opacity-70" />
       <div className="min-w-0 max-w-2xl">
         <div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-lg border border-plasma/30 bg-plasma/10 px-3 py-2 text-xs text-plasma shadow-glow backdrop-blur-xl sm:mb-6 sm:text-sm">
           <Wand2 className="h-4 w-4" aria-hidden="true" />
-          <span className="truncate">AI edit command center</span>
+          <span className="truncate">ChatGPT for viral cinematic video editing</span>
         </div>
         <h1 className="max-w-full font-[var(--font-space)] text-[2.15rem] font-black leading-[1.02] tracking-normal text-white min-[390px]:text-[2.35rem] sm:text-6xl sm:leading-[0.96] lg:text-8xl">
           <span className="block">Turn Raw Clips</span>
@@ -23,20 +25,20 @@ export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
           </span>
         </h1>
         <p className="mt-5 max-w-xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-xl sm:leading-8">
-          AI-powered video editing for creators, gamers, businesses, and viral short-form content.
+          AI-powered editing for creators, gamers, businesses, and viral short-form content.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a href="#studio" className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-bold text-[#05070d] shadow-[0_0_40px_rgba(255,255,255,.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-slate-200">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href="#studio" className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-black text-[#05070d] shadow-[0_0_48px_rgba(255,255,255,.22)] transition duration-300 hover:-translate-y-0.5 hover:bg-slate-200 sm:h-12">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            Start Creating
+            Start Editing
           </a>
-          <a href="#results" className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/[0.05] px-5 text-sm font-semibold text-white backdrop-blur-xl transition duration-300 hover:border-plasma/40 hover:bg-plasma/10">
+          <a href="#demo" className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.05] px-6 text-sm font-bold text-white backdrop-blur-xl transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 hover:shadow-glow sm:h-12">
             <Play className="h-4 w-4" aria-hidden="true" />
             Watch Demo
           </a>
         </div>
-        <div className="mt-8 grid gap-3 sm:grid-cols-3">
-          {[["38K", "videos rendered"], ["4.9x", "faster workflow"], ["94%", "viral score"]].map(([value, label]) => (
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {creatorStats.map(([value, label]) => (
             <div key={label} className="glass-card rounded-xl px-4 py-4 transition duration-300 hover:-translate-y-1 hover:border-plasma/35 hover:shadow-glow">
               <div className="font-[var(--font-space)] text-3xl font-black text-white">{value}</div>
               <div className="mt-1 text-sm text-slate-400">{label}</div>
@@ -46,6 +48,24 @@ export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
       </div>
 
       <div className="relative min-w-0">
+        <div className="float-card absolute -left-2 top-8 z-10 hidden rounded-2xl border border-white/10 bg-black/45 p-4 shadow-glow backdrop-blur-2xl lg:block">
+          <div className="flex items-center gap-3">
+            <Zap className="h-5 w-5 text-signal" aria-hidden="true" />
+            <div>
+              <div className="text-sm font-bold text-white">Hook detected</div>
+              <div className="text-xs text-slate-400">0:00-0:02 retention spike</div>
+            </div>
+          </div>
+        </div>
+        <div className="float-card absolute -right-3 bottom-24 z-10 hidden rounded-2xl border border-plasma/20 bg-plasma/10 p-4 shadow-glow backdrop-blur-2xl lg:block [animation-delay:-1.4s]">
+          <div className="flex items-center gap-3">
+            <AudioWaveform className="h-5 w-5 text-plasma" aria-hidden="true" />
+            <div>
+              <div className="text-sm font-bold text-white">Beat sync ready</div>
+              <div className="text-xs text-slate-400">18 cuts mapped</div>
+            </div>
+          </div>
+        </div>
         <div className="absolute -inset-2 rounded-[2rem] bg-gradient-to-br from-plasma/25 via-transparent to-aurora/25 blur-3xl sm:-inset-5" />
         <div className="preview-frame relative overflow-hidden rounded-3xl border border-white/15 bg-[#08101b]/80 shadow-2xl shadow-black/60 backdrop-blur-2xl">
           <div className="relative aspect-video min-h-0 sm:aspect-[16/10] sm:min-h-[310px]">
@@ -55,6 +75,19 @@ export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
             <div className="absolute inset-x-8 top-8 h-px animate-scan bg-gradient-to-r from-transparent via-plasma to-transparent" />
             <div className="absolute left-3 top-3 rounded-lg border border-white/10 bg-black/45 px-2.5 py-1.5 text-xs text-slate-200 shadow-glow backdrop-blur-xl sm:left-4 sm:top-4 sm:px-3 sm:py-2 sm:text-sm">Preview 01</div>
             <div className="absolute right-3 top-3 rounded-lg border border-signal/25 bg-signal/10 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-signal backdrop-blur-xl sm:right-4 sm:top-4 sm:px-3 sm:py-2 sm:text-xs sm:tracking-[0.22em]">AI online</div>
+            <div className="absolute bottom-5 left-4 right-4 grid gap-2 sm:left-6 sm:right-6 sm:grid-cols-3">
+              {["Hook", "Captions", "Grade"].map((label, index) => (
+                <div key={label} className="rounded-xl border border-white/10 bg-black/45 p-3 backdrop-blur-xl">
+                  <div className="flex items-center gap-2 text-xs text-slate-300">
+                    <Clapperboard className="h-3.5 w-3.5 text-plasma" aria-hidden="true" />
+                    {label}
+                  </div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                    <div className={`h-full rounded-full bg-gradient-to-r ${index === 1 ? "from-signal to-plasma w-[82%]" : index === 2 ? "from-aurora to-white w-[66%]" : "from-plasma to-white w-[92%]"} animate-bar-shimmer`} />
+                  </div>
+                </div>
+              ))}
+            </div>
             <button className="absolute left-1/2 top-1/2 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-white/15 text-white shadow-glow backdrop-blur-md transition duration-300 hover:scale-110 sm:h-20 sm:w-20" aria-label="Play preview">
               <span className="absolute inset-0 rounded-full border border-plasma/40 animate-ping" />
               <Play className="relative ml-1 h-6 w-6 fill-white sm:h-8 sm:w-8" aria-hidden="true" />

@@ -96,12 +96,12 @@ function parseProgress(stderr: string, targetDuration: number) {
 }
 
 function stepForProgress(progress: number) {
-  if (progress < 18) return "Analyzing video";
-  if (progress < 30) return "Detecting scenes";
-  if (progress < 45) return "Cutting clips";
-  if (progress < 60) return "Adding captions";
-  if (progress < 76) return "Applying transitions";
-  if (progress < 90) return "Enhancing audio";
+  if (progress < 18) return "Analyzing clips";
+  if (progress < 30) return "Detecting highlights";
+  if (progress < 45) return "Syncing beats";
+  if (progress < 60) return "Generating captions";
+  if (progress < 76) return "Optimizing pacing";
+  if (progress < 90) return "Applying cinematic effects";
   return "Preparing export";
 }
 
@@ -227,8 +227,8 @@ export async function renderWithFfmpeg({
   log("Beat-sync preparation structure initialized.");
   log("Speed ramp markers prepared for future AI timing.");
   log("Automatic captions placeholder track generated.");
-  onEvent({ type: "progress", progress: 5, step: "Analyzing video" });
-  onEvent({ type: "progress", progress: 14, step: "Detecting scenes" });
+  onEvent({ type: "progress", progress: 5, step: "Analyzing clips" });
+  onEvent({ type: "progress", progress: 14, step: "Detecting highlights" });
 
   const ffmpegCommand = resolveFfmpegCommand();
   const ffprobeCommand = resolveFfprobeCommand(ffmpegCommand);

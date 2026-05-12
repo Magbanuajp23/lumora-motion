@@ -1,11 +1,11 @@
-import { ArrowUpRight, Coins, CreditCard, Sparkles, Zap } from "lucide-react";
+import { ArrowUpRight, Coins, CreditCard, ListChecks, Sparkles, Zap } from "lucide-react";
 import { SectionHeader } from "@/components/ui/section-header";
-import { creditBundles, creditCosts, creditSummary, usageHistory } from "@/lib/lumora-motion-data";
+import { aiSuggestions, creditBundles, creditCosts, creditSummary, renderQueue, usageHistory } from "@/lib/lumora-motion-data";
 
 export function DashboardSection() {
   return (
     <section id="dashboard" className="relative overflow-x-hidden border-y border-white/10 bg-[#03050a]/90 px-4 py-16 sm:px-6 lg:px-8">
-      <SectionHeader eyebrow="Dashboard" title="Creator credit command center" copy="Track monthly credits, usage history, plan status, and upgrades from a futuristic analytics dashboard." />
+      <SectionHeader eyebrow="Dashboard" title="AI editing operating system" copy="Track renders, credits, suggestions, export status, and recent projects from one creator command center." />
       <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <div className="glass-panel min-w-0 rounded-3xl p-5 sm:p-6">
           <div className="flex items-center justify-between">
@@ -61,6 +61,53 @@ export function DashboardSection() {
                   <div className="mt-1 text-sm text-slate-400">{style}</div>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300">{stat}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {[
+              ["Queue", "3 active"],
+              ["Exports", "18 this week"],
+              ["Avg viral score", "91%"]
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                <div className="text-sm text-slate-400">{label}</div>
+                <div className="mt-1 font-[var(--font-space)] text-2xl font-black text-white">{value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto mt-6 grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <div className="glass-panel min-w-0 rounded-3xl p-5 sm:p-6">
+          <div className="flex items-center gap-3">
+            <ListChecks className="h-6 w-6 text-signal" aria-hidden="true" />
+            <h3 className="font-[var(--font-space)] text-2xl font-black text-white">Render queue</h3>
+          </div>
+          <div className="mt-5 grid gap-3">
+            {renderQueue.map(([project, status, progress]) => (
+              <div key={project} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-bold text-white">{project}</div>
+                    <div className="mt-1 text-sm text-slate-400">{status}</div>
+                  </div>
+                  <span className="rounded-lg border border-plasma/20 bg-plasma/10 px-3 py-2 text-sm font-bold text-plasma">{progress}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="glass-panel min-w-0 rounded-3xl p-5 sm:p-6">
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-6 w-6 text-plasma" aria-hidden="true" />
+            <h3 className="font-[var(--font-space)] text-2xl font-black text-white">AI suggestions</h3>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {aiSuggestions.map(([title, copy]) => (
+              <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition duration-300 hover:-translate-y-1 hover:border-plasma/35">
+                <div className="font-bold text-white">{title}</div>
+                <p className="mt-2 text-sm leading-6 text-slate-400">{copy}</p>
               </div>
             ))}
           </div>

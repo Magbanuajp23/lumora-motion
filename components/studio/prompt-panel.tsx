@@ -1,4 +1,4 @@
-import { BadgeCheck, Clapperboard, ImageUp, Loader2, MessageSquareText, Sparkles, Zap } from "lucide-react";
+import { BadgeCheck, BrainCircuit, Clapperboard, ImageUp, Loader2, MessageSquareText, Sparkles, WandSparkles, Zap } from "lucide-react";
 import { presets, promptExamples } from "@/lib/lumora-motion-data";
 
 const presetIcons = {
@@ -44,7 +44,7 @@ export function PromptPanel({
           {isGenerating ? "Generating" : "Generate Edit"}
         </button>
       </div>
-      <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-3 shadow-inner shadow-black/40 transition duration-300 focus-within:border-plasma/45 focus-within:shadow-glow">
+      <div className="mt-6 rounded-3xl border border-plasma/15 bg-black/25 p-3 shadow-inner shadow-black/40 transition duration-300 focus-within:border-plasma/55 focus-within:shadow-glow">
         <div className="mb-3 flex items-center justify-between gap-3 border-b border-white/10 px-2 pb-3 text-[10px] uppercase tracking-[0.14em] text-slate-500 sm:text-xs sm:tracking-[0.2em]">
           <span className="inline-flex min-w-0 items-center gap-2">
             <MessageSquareText className="h-4 w-4 text-plasma" aria-hidden="true" />
@@ -52,14 +52,26 @@ export function PromptPanel({
           </span>
           <span className="shrink-0">{prompt.length} chars</span>
         </div>
-        <textarea value={prompt} onChange={(event) => onPrompt(event.target.value)} rows={8} className="min-h-64 w-full resize-none bg-transparent p-3 text-base leading-7 text-slate-100 outline-none placeholder:text-slate-600 sm:min-h-72 sm:text-lg sm:leading-8" placeholder="Describe the edit you want..." />
+        <div className="mb-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-2 text-xs text-slate-400">
+          <BrainCircuit className="h-4 w-4 text-signal" aria-hidden="true" />
+          <span className="typing-line min-w-0 overflow-hidden whitespace-nowrap">
+            AI is ready to structure hook, pacing, captions, beat sync, and cinematic grade.
+          </span>
+        </div>
+        <textarea value={prompt} onChange={(event) => onPrompt(event.target.value)} rows={8} className="min-h-64 w-full resize-none bg-transparent p-3 text-base leading-7 text-slate-100 outline-none placeholder:text-slate-600 sm:min-h-72 sm:text-lg sm:leading-8" placeholder="Make this a viral TikTok edit with bold captions, fast pacing, and a strong final payoff..." />
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {promptExamples.map((example) => (
-          <button key={example} onClick={() => onPrompt(example)} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300 transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 hover:text-white">
-            {example}
-          </button>
-        ))}
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-3">
+        <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+          <WandSparkles className="h-4 w-4 text-plasma" aria-hidden="true" />
+          Smart prompt suggestions
+        </div>
+        <div className="prompt-marquee flex gap-2">
+          {[...promptExamples, ...promptExamples].map((example, index) => (
+            <button key={`${example}-${index}`} onClick={() => onPrompt(example)} className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300 transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 hover:text-white">
+              {example}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <label className="rounded-2xl border border-white/10 bg-black/20 p-4">

@@ -58,19 +58,20 @@ export const presets = [
 ];
 
 export const promptExamples = [
-  "Make this a viral TikTok edit",
-  "Make it cinematic and emotional",
-  "Add luxury real estate vibe",
-  "Make it fast-paced with captions"
+  "Make this a viral TikTok edit.",
+  "Create a cinematic luxury reel.",
+  "Turn this into a gaming montage with phonk.",
+  "Add Alex Hormozi style captions.",
+  "Make this emotional and cinematic."
 ];
 
 export const processingSteps = [
-  "Analyzing video",
-  "Detecting scenes",
-  "Cutting clips",
-  "Adding captions",
-  "Applying transitions",
-  "Enhancing audio",
+  "Analyzing clips",
+  "Detecting highlights",
+  "Syncing beats",
+  "Generating captions",
+  "Optimizing pacing",
+  "Applying cinematic effects",
   "Preparing export"
 ];
 
@@ -204,10 +205,86 @@ export const workflowSteps = [
 ] as const;
 
 export const featureHighlights = [
-  ["Prompt-to-edit", "Turn rough clips into polished shorts with natural language direction."],
-  ["Credit-aware rendering", "See exactly how edits, captions, VFX, and 4K exports consume credits."],
-  ["Cinematic presets", "Use viral, luxury, real estate, motivational, and trailer-style looks."],
+  ["Prompt-to-edit", "Turn rough clips into polished TikToks, Reels, and Shorts with natural language direction."],
+  ["Viral pacing engine", "Structure hooks, beat cuts, captions, and payoff moments around short-form retention."],
+  ["Cinematic presets", "Use viral, luxury, gaming, real estate, motivational, and trailer-style looks."],
   ["FFmpeg export core", "Frontend MVP backed by a real local render/export pipeline."]
+] as const;
+
+export const creatorStats = [
+  ["38K+", "videos rendered"],
+  ["12K+", "creator workflows"],
+  ["4.9/5", "average rating"],
+  ["94%", "top viral score"]
+] as const;
+
+export const demoCategories = [
+  {
+    name: "TikTok edits",
+    raw: "Raw hook",
+    edited: "Caption punch",
+    accent: "from-signal to-plasma",
+    stat: "2.1x retention"
+  },
+  {
+    name: "gaming montages",
+    raw: "Long gameplay",
+    edited: "Phonk drop",
+    accent: "from-plasma to-aurora",
+    stat: "18 beat cuts"
+  },
+  {
+    name: "luxury reels",
+    raw: "Phone footage",
+    edited: "Premium grade",
+    accent: "from-aurora to-white",
+    stat: "cinema look"
+  },
+  {
+    name: "real estate edits",
+    raw: "Walkthrough",
+    edited: "Listing reel",
+    accent: "from-white to-signal",
+    stat: "32 scenes"
+  },
+  {
+    name: "podcast shorts",
+    raw: "Long episode",
+    edited: "Viral clip",
+    accent: "from-signal to-white",
+    stat: "smart captions"
+  },
+  {
+    name: "vlog edits",
+    raw: "Daily clips",
+    edited: "Story arc",
+    accent: "from-plasma to-signal",
+    stat: "fast pacing"
+  }
+] as const;
+
+export const templates = [
+  ["Viral TikTok", "Hook cut", "2 credits", ["captions", "beat cuts", "9:16"], "Trending"],
+  ["Gaming Montage", "Phonk sync", "3 credits", ["speed ramps", "impact zooms", "bass hits"], "Hot"],
+  ["Luxury Lifestyle", "Premium reel", "2 credits", ["soft glow", "slow reveals", "brand grade"], "Pro"],
+  ["Cinematic Reels", "Trailer pass", "2 credits", ["film grade", "sound swells", "dramatic fades"], "New"],
+  ["Podcast Clips", "Talking head", "1 credit", ["captions", "jump cuts", "headline hook"], "Creator"],
+  ["Real Estate Reels", "Listing tour", "2 credits", ["room labels", "smooth pans", "bright grade"], "Agency"],
+  ["Business Ads", "Founder offer", "2 credits", ["CTA captions", "product beats", "clean pacing"], "Launch"],
+  ["Motivational Edits", "Story arc", "2 credits", ["bold quotes", "emotional lift", "final punch"], "Viral"]
+] as const;
+
+export const aiSuggestions = [
+  ["Boost opening hook", "Lead with the strongest visual in the first 1.2 seconds."],
+  ["Add pattern interrupt", "Insert a zoom pulse before the third caption beat."],
+  ["Shorten dead air", "Remove 4.6 seconds of low-motion footage from the middle."],
+  ["Export vertical cut", "Create a 9:16 Shorts version for reposting."]
+] as const;
+
+export const renderQueue = [
+  ["Client launch reel", "Rendering", "72%"],
+  ["Gaming montage batch", "Queued", "starts next"],
+  ["Podcast highlight", "Exported", "1080p"]
 ] as const;
 
 export const faqs = [
