@@ -1,0 +1,1577 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lumora Motion Premium Preview</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --void: #03050a;
+        --panel: rgba(255, 255, 255, 0.06);
+        --line: rgba(255, 255, 255, 0.13);
+        --text: #eef7ff;
+        --muted: #9aa8bb;
+        --plasma: #20d9ff;
+        --aurora: #b75cff;
+        --signal: #7cffc4;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        color: var(--text);
+        background: var(--void);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 22%, rgba(32, 217, 255, 0.22), transparent 26rem),
+          radial-gradient(circle at 78% 8%, rgba(183, 92, 255, 0.2), transparent 30rem),
+          radial-gradient(circle at 55% 78%, rgba(124, 255, 196, 0.1), transparent 26rem),
+          linear-gradient(180deg, #03050a 0%, #07101b 50%, #03050a 100%);
+        animation: aurora 14s ease-in-out infinite alternate;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.7;
+        background-image:
+          linear-gradient(rgba(32, 217, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(32, 217, 255, 0.1) 1px, transparent 1px);
+        background-size: 54px 54px;
+        mask-image: linear-gradient(to bottom, black, transparent 72%);
+      }
+
+      button,
+      textarea,
+      input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .wrap {
+        position: relative;
+        width: min(100%, 1280px);
+        margin: 0 auto;
+        padding: 20px 24px 56px;
+      }
+
+      .glass {
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+          rgba(6, 10, 18, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 24px 80px rgba(0, 0, 0, 0.32);
+        backdrop-filter: blur(22px);
+      }
+
+      .nav,
+      .brand,
+      .status,
+      .hero-actions,
+      .export-title,
+      .form-head,
+      .stats,
+      .timeline-row,
+      .step-head {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav {
+        justify-content: space-between;
+        gap: 16px;
+        border-radius: 16px;
+        padding: 12px 16px;
+      }
+
+      .brand {
+        gap: 12px;
+      }
+
+      .brand strong,
+      h1,
+      h2,
+      .metric {
+        font-family: "Space Grotesk", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+      }
+
+      .brand strong {
+        display: block;
+        font-size: 21px;
+        line-height: 1;
+      }
+
+      .brand small {
+        display: block;
+        margin-top: 4px;
+        color: #718096;
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+      }
+
+      .mark,
+      .play,
+      .download,
+      .icon-box {
+        display: grid;
+        place-items: center;
+      }
+
+      .mark {
+        position: relative;
+        width: 44px;
+        height: 44px;
+        border: 1px solid rgba(32, 217, 255, 0.42);
+        border-radius: 12px;
+        background: rgba(32, 217, 255, 0.11);
+        color: var(--plasma);
+        box-shadow: 0 0 36px rgba(32, 217, 255, 0.22);
+      }
+
+      .status {
+        gap: 10px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.045);
+        padding: 0 12px;
+        color: #cdd7e5;
+        font-size: 14px;
+      }
+
+      .pill.live {
+        border-color: rgba(124, 255, 196, 0.22);
+        background: rgba(124, 255, 196, 0.1);
+        color: var(--signal);
+      }
+
+      .pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--signal);
+        box-shadow: 0 0 20px var(--signal);
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      .hero {
+        min-height: calc(100vh - 80px);
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        gap: 34px;
+        align-items: center;
+        padding: 48px 0;
+      }
+
+      .badge {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        border: 1px solid rgba(32, 217, 255, 0.3);
+        border-radius: 12px;
+        background: rgba(32, 217, 255, 0.1);
+        padding: 9px 12px;
+        color: var(--plasma);
+        font-size: 14px;
+        box-shadow: 0 0 36px rgba(32, 217, 255, 0.22);
+      }
+
+      h1 {
+        margin: 24px 0 0;
+        color: white;
+        font-size: clamp(58px, 8vw, 104px);
+        line-height: 0.96;
+        letter-spacing: 0;
+      }
+
+      h1 span {
+        display: block;
+        background: linear-gradient(90deg, var(--plasma), white, var(--aurora));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .lead {
+        max-width: 620px;
+        margin: 24px 0 0;
+        color: #c5cfdd;
+        font-size: 20px;
+        line-height: 1.7;
+      }
+
+      .stats {
+        gap: 12px;
+        margin-top: 32px;
+      }
+
+      .stat {
+        flex: 1;
+        min-width: 0;
+        border-radius: 14px;
+        padding: 16px;
+        transition: 300ms ease;
+      }
+
+      .stat:hover,
+      .preset:hover,
+      .primary:hover,
+      .ghost:hover {
+        transform: translateY(-3px);
+      }
+
+      .metric {
+        color: white;
+        font-size: 31px;
+        font-weight: 900;
+      }
+
+      .label {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .hero-actions {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 32px;
+      }
+
+      .primary,
+      .ghost {
+        min-height: 48px;
+        border-radius: 12px;
+        padding: 0 18px;
+        font-weight: 800;
+        transition: 300ms ease;
+      }
+
+      .primary {
+        border: 0;
+        background: white;
+        color: #05070d;
+        box-shadow: 0 0 40px rgba(255, 255, 255, 0.18);
+      }
+
+      .ghost {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.055);
+        color: white;
+      }
+
+      .preview-shell {
+        position: relative;
+      }
+
+      .preview-shell::before {
+        content: "";
+        position: absolute;
+        inset: -20px;
+        border-radius: 34px;
+        background: linear-gradient(135deg, rgba(32, 217, 255, 0.25), transparent, rgba(183, 92, 255, 0.25));
+        filter: blur(30px);
+      }
+
+      .preview {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        background: rgba(8, 16, 27, 0.82);
+      }
+
+      .preview::after,
+      .drop::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(120deg, transparent 25%, rgba(255, 255, 255, 0.11), transparent 75%);
+        transform: translateX(-120%);
+        animation: sheen 5.5s ease-in-out infinite;
+      }
+
+      .media {
+        position: relative;
+        min-height: 320px;
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        background-image:
+          linear-gradient(to top, #05070d, rgba(5, 7, 13, 0.2), transparent),
+          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          url("/lumora-motion-hero.png");
+        background-size: cover, 100% 6px, cover;
+        background-position: center;
+      }
+
+      .scan {
+        position: absolute;
+        left: 32px;
+        right: 32px;
+        top: 32px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--plasma), transparent);
+        animation: scan 3.2s ease-in-out infinite;
+      }
+
+      .chip,
+      .ai-chip {
+        position: absolute;
+        top: 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.46);
+        padding: 9px 12px;
+        color: #dce5f0;
+        backdrop-filter: blur(12px);
+        font-size: 14px;
+      }
+
+      .chip {
+        left: 16px;
+      }
+
+      .ai-chip {
+        right: 16px;
+        border-color: rgba(124, 255, 196, 0.25);
+        background: rgba(124, 255, 196, 0.1);
+        color: var(--signal);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .play {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 80px;
+        height: 80px;
+        transform: translate(-50%, -50%);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        color: white;
+        box-shadow: 0 0 36px rgba(32, 217, 255, 0.22);
+        backdrop-filter: blur(12px);
+        transition: 300ms ease;
+      }
+
+      .play:hover {
+        transform: translate(-50%, -50%) scale(1.08);
+      }
+
+      .export {
+        border-top: 1px solid var(--line);
+        background: rgba(6, 10, 18, 0.92);
+        padding: 20px;
+      }
+
+      .export-title,
+      .form-head,
+      .step-head {
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      h2 {
+        margin: 5px 0 0;
+        color: white;
+        font-size: 25px;
+        line-height: 1.2;
+      }
+
+      .download {
+        width: 44px;
+        height: 44px;
+        border: 1px solid rgba(32, 217, 255, 0.32);
+        border-radius: 12px;
+        background: rgba(32, 217, 255, 0.1);
+        color: var(--plasma);
+      }
+
+      .timeline,
+      .steps {
+        margin-top: 20px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .timeline-row {
+        gap: 12px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .track {
+        flex: 1;
+        height: 12px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .bar {
+        height: 100%;
+        border-radius: 999px;
+        background-size: 220% 100%;
+        animation: shimmer 2.4s ease-in-out infinite;
+      }
+
+      .workspace,
+      .intel {
+        display: grid;
+        gap: 24px;
+      }
+
+      .workspace {
+        grid-template-columns: 0.82fr 1.18fr;
+        border-top: 1px solid var(--line);
+        padding-top: 48px;
+      }
+
+      .intel {
+        grid-template-columns: 1fr 1.35fr;
+        margin-top: 24px;
+      }
+
+      .panel {
+        border-radius: 24px;
+        padding: 24px;
+      }
+
+      .drop {
+        position: relative;
+        overflow: hidden;
+        margin-top: 24px;
+        min-height: 224px;
+        display: grid;
+        place-items: center;
+        border: 1px dashed rgba(32, 217, 255, 0.45);
+        border-radius: 24px;
+        background: rgba(32, 217, 255, 0.065);
+        text-align: center;
+        color: #dce5f0;
+        transition: 300ms ease;
+      }
+
+      .drop:hover {
+        transform: translateY(-4px);
+        border-color: var(--plasma);
+        background: rgba(32, 217, 255, 0.11);
+        box-shadow: 0 0 36px rgba(32, 217, 255, 0.22);
+      }
+
+      .upload-icon {
+        display: grid;
+        place-items: center;
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 18px;
+        border: 1px solid rgba(32, 217, 255, 0.32);
+        border-radius: 18px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--plasma);
+        font-size: 32px;
+      }
+
+      .drop.dragging {
+        border-color: var(--signal);
+        background: rgba(124, 255, 196, 0.12);
+        box-shadow: 0 0 36px rgba(32, 217, 255, 0.22);
+      }
+
+      .drop video {
+        width: 100%;
+        max-height: 260px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        object-fit: cover;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+
+      .file-pill {
+        margin-top: 16px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.26);
+        padding: 14px;
+        color: #cfd8e4;
+        font-size: 14px;
+      }
+
+      .ready {
+        float: right;
+        border-radius: 8px;
+        background: rgba(124, 255, 196, 0.1);
+        padding: 3px 8px;
+        color: var(--signal);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .upload-meta {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        margin-top: 10px;
+        color: #718096;
+        font-size: 12px;
+      }
+
+      .upload-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .secondary {
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.045);
+        color: white;
+        font-weight: 800;
+      }
+
+      .prompt-box {
+        margin-top: 24px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: rgba(0, 0, 0, 0.28);
+        padding: 12px;
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .prompt-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .prompt-chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.045);
+        color: #cfd8e4;
+        padding: 9px 12px;
+        font-size: 14px;
+        transition: 300ms ease;
+      }
+
+      .prompt-chip:hover {
+        border-color: rgba(32, 217, 255, 0.45);
+        background: rgba(32, 217, 255, 0.1);
+        color: white;
+      }
+
+      .prompt-tools {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+        padding: 0 8px 12px;
+        color: #718096;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 270px;
+        margin-top: 10px;
+        resize: vertical;
+        border: 0;
+        background: transparent;
+        color: #f4f8ff;
+        outline: 0;
+        padding: 10px;
+        line-height: 1.65;
+      }
+
+      .presets,
+      .shot-grid {
+        margin-top: 20px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .presets {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      .shot-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .preset,
+      .shot,
+      .step {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 16px;
+      }
+
+      .preset {
+        min-height: 160px;
+        transition: 300ms ease;
+      }
+
+      .preset.active {
+        border-color: rgba(32, 217, 255, 0.62);
+        background: rgba(32, 217, 255, 0.1);
+        box-shadow: 0 0 36px rgba(32, 217, 255, 0.22);
+      }
+
+      .icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--plasma), white, var(--aurora));
+        color: #05070d;
+        font-weight: 900;
+      }
+
+      .preset-title {
+        margin-top: 16px;
+        color: white;
+        font-weight: 900;
+      }
+
+      .preset-meta {
+        margin-top: 4px;
+        color: var(--plasma);
+        font-size: 14px;
+      }
+
+      .preset-detail {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .loader {
+        width: 24px;
+        height: 24px;
+        border: 2px solid rgba(32, 217, 255, 0.22);
+        border-top-color: var(--plasma);
+        border-radius: 999px;
+        animation: spin 1s linear infinite;
+      }
+
+      .step .bar {
+        width: 8%;
+        animation: processing 2.4s ease-in-out infinite;
+      }
+
+      .step.active {
+        border-color: rgba(32, 217, 255, 0.55);
+        background: rgba(32, 217, 255, 0.1);
+        box-shadow: 0 0 36px rgba(32, 217, 255, 0.22);
+      }
+
+      .step.complete {
+        border-color: rgba(124, 255, 196, 0.25);
+        background: rgba(124, 255, 196, 0.06);
+      }
+
+      .step.complete .bar {
+        width: 100%;
+        animation: none;
+      }
+
+      .shot-value {
+        margin-top: 6px;
+        color: white;
+        font: 800 21px/1.2 "Space Grotesk", "Segoe UI", sans-serif;
+      }
+
+      .results {
+        margin-top: 24px;
+        overflow: hidden;
+        border-radius: 28px;
+      }
+
+      .results-head {
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(90deg, rgba(124,255,196,.08), rgba(32,217,255,.08), rgba(183,92,255,.08));
+        padding: 24px;
+      }
+
+      .success {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(124,255,196,.25);
+        border-radius: 999px;
+        background: rgba(124,255,196,.1);
+        color: var(--signal);
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: 1.25fr .75fr;
+        gap: 24px;
+        padding: 24px;
+      }
+
+      .render-preview,
+      .comparison {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: rgba(0,0,0,.3);
+      }
+
+      .render-media,
+      .comparison-media {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        min-height: 260px;
+        background-image:
+          linear-gradient(to top, rgba(0,0,0,.72), transparent 58%, rgba(0,0,0,.22)),
+          linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+          url("/lumora-motion-hero.png");
+        background-size: cover, 100% 6px, cover;
+        background-position: center;
+      }
+
+      .render-play {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 68px;
+        height: 68px;
+        transform: translate(-50%, -50%);
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 999px;
+        background: rgba(255,255,255,.16);
+        color: white;
+        box-shadow: 0 0 36px rgba(32,217,255,.22);
+        backdrop-filter: blur(14px);
+      }
+
+      .render-timeline {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(0,0,0,.45);
+        padding: 12px;
+        backdrop-filter: blur(16px);
+      }
+
+      .comparison {
+        margin-top: 18px;
+        padding: 16px;
+      }
+
+      .comparison-media {
+        min-height: 230px;
+        filter: grayscale(1) contrast(.8) brightness(.55);
+      }
+
+      .after-layer {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 58%;
+        overflow: hidden;
+        filter: none;
+      }
+
+      .after-layer::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: min(760px, 80vw);
+        background-image: url("/lumora-motion-hero.png");
+        background-size: cover;
+        background-position: center;
+        filter: saturate(1.5) contrast(1.25);
+      }
+
+      .compare-line {
+        position: absolute;
+        inset: 0 auto 0 58%;
+        width: 1px;
+        background: white;
+        box-shadow: 0 0 24px rgba(32,217,255,.85);
+      }
+
+      .quality-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255,255,255,.035);
+        color: #dce5f0;
+        padding: 13px 14px;
+        text-align: left;
+      }
+
+      .quality-option.active {
+        border-color: rgba(32,217,255,.55);
+        background: rgba(32,217,255,.1);
+        box-shadow: 0 0 36px rgba(32,217,255,.22);
+      }
+
+      .result-stat {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255,255,255,.035);
+        padding: 14px;
+      }
+
+      .burst {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: 96px;
+        border: 1px solid rgba(32,217,255,.2);
+        border-radius: 20px;
+        background: rgba(0,0,0,.24);
+        overflow: hidden;
+      }
+
+      .burst::before,
+      .burst::after {
+        content: "";
+        position: absolute;
+        inset: 16px;
+        border: 1px solid rgba(32,217,255,.38);
+        border-radius: 999px;
+        animation: renderPulse 2.4s ease-out infinite;
+      }
+
+      .burst::after {
+        animation-delay: .8s;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 18px;
+        color: #cfd8e4;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .nav-links a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .saas-section {
+        margin-top: 28px;
+        border-radius: 28px;
+        padding: 28px;
+      }
+
+      .section-title {
+        text-align: center;
+        max-width: 760px;
+        margin: 0 auto 26px;
+      }
+
+      .section-title h2 {
+        font-size: clamp(32px, 5vw, 54px);
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .feature-card,
+      .price-card,
+      .auth-card {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: rgba(255,255,255,.035);
+        padding: 20px;
+      }
+
+      .price-card.featured {
+        border-color: rgba(32,217,255,.55);
+        box-shadow: 0 0 36px rgba(32,217,255,.22);
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: .8fr 1.2fr;
+        gap: 18px;
+      }
+
+      @keyframes aurora {
+        from {
+          filter: hue-rotate(0deg);
+          transform: scale(1);
+        }
+        to {
+          filter: hue-rotate(18deg);
+          transform: scale(1.05);
+        }
+      }
+
+      @keyframes pulse {
+        50% {
+          opacity: 0.45;
+          transform: scale(1.35);
+        }
+      }
+
+      @keyframes scan {
+        0%, 100% {
+          opacity: 0;
+          transform: translateY(0);
+        }
+        15%, 70% {
+          opacity: 1;
+        }
+        80% {
+          opacity: 0;
+          transform: translateY(17rem);
+        }
+      }
+
+      @keyframes shimmer {
+        0%, 100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      @keyframes sheen {
+        0%, 40% {
+          transform: translateX(-120%);
+        }
+        75%, 100% {
+          transform: translateX(120%);
+        }
+      }
+
+      @keyframes processing {
+        0%, 100% {
+          width: 36%;
+          transform: translateX(0);
+        }
+        50% {
+          width: 82%;
+          transform: translateX(10%);
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes renderPulse {
+        from {
+          opacity: .9;
+          transform: scale(.45);
+        }
+        to {
+          opacity: 0;
+          transform: scale(1.65);
+        }
+      }
+
+      @media (max-width: 980px) {
+        .hero,
+        .workspace,
+        .intel,
+        .results-grid,
+        .dashboard-grid,
+        .card-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          min-height: auto;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .wrap {
+          padding-inline: 16px;
+        }
+
+        .status {
+          display: none;
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .stats,
+        .export-title,
+        .form-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .presets,
+        .shot-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .presets,
+        .shot-grid {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 52px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="nav glass">
+        <div class="brand">
+          <span class="mark">*</span>
+          <span><strong>Lumora Motion</strong><small>AI motion studio</small></span>
+        </div>
+        <div class="nav-links">
+          <a href="#home">Home</a>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#dashboard">Dashboard</a>
+          <a href="#login">Login</a>
+          <a href="#signup">Sign Up</a>
+        </div>
+        <div class="status">
+          <span class="pill live"><span class="pulse"></span>Live render mesh</span>
+          <span class="pill">18ms latency</span>
+        </div>
+      </nav>
+
+      <section class="hero" id="home">
+        <div>
+          <div class="badge">* AI edit command center</div>
+          <h1>Lumora Motion <span>viral cinematic edits.</span></h1>
+          <p class="lead">Turn raw videos into cinematic edits with AI prompts.</p>
+          <div class="stats">
+            <div class="stat glass"><div class="metric">4K</div><div class="label">export ready</div></div>
+            <div class="stat glass"><div class="metric">92%</div><div class="label">cut confidence</div></div>
+            <div class="stat glass"><div class="metric">18s</div><div class="label">first draft</div></div>
+          </div>
+          <div class="hero-actions">
+            <button class="primary">* Start creating</button>
+            <button class="ghost">Play demo</button>
+          </div>
+        </div>
+
+        <div class="preview-shell">
+          <div class="preview glass">
+            <div class="media">
+              <div class="scan"></div>
+              <div class="chip">Preview 01</div>
+              <div class="ai-chip">AI online</div>
+              <button class="play" aria-label="Play preview">▶</button>
+            </div>
+            <div class="export">
+              <div class="export-title">
+                <div><p class="eyebrow">Export preview</p><h2>Cinematic render pass</h2></div>
+                <button class="download" aria-label="Download export">↓</button>
+              </div>
+              <div class="timeline">
+                <div class="timeline-row"><span>Scene</span><div class="track"><div class="bar" style="width:76%;background-image:linear-gradient(90deg,var(--plasma),#fff)"></div></div></div>
+                <div class="timeline-row"><span>Grade</span><div class="track"><div class="bar" style="width:58%;background-image:linear-gradient(90deg,var(--aurora),var(--plasma))"></div></div></div>
+                <div class="timeline-row"><span>Audio</span><div class="track"><div class="bar" style="width:86%;background-image:linear-gradient(90deg,var(--signal),var(--plasma))"></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="saas-section glass" id="features">
+        <div class="section-title">
+          <p class="eyebrow">Features</p>
+          <h2>A complete AI creator cockpit</h2>
+          <p class="label">Upload, prompt, process, compare, export, and monitor AI activity from one futuristic SaaS workspace.</p>
+        </div>
+        <div class="card-grid">
+          <div class="feature-card"><div class="preset-title">Smart uploads</div><p class="label">MP4, MOV, WebM drag-and-drop with preview metadata.</p></div>
+          <div class="feature-card"><div class="preset-title">Prompt editing</div><p class="label">Large cinematic input, chips, and style presets.</p></div>
+          <div class="feature-card"><div class="preset-title">Render analytics</div><p class="label">Track captions, transitions, optimized scenes, and viral score.</p></div>
+        </div>
+      </section>
+
+      <section class="workspace" id="studio">
+        <div class="panel glass">
+          <div class="form-head">
+            <div><p class="eyebrow">Source video</p><h2>Upload footage</h2></div>
+            <div style="color:var(--plasma)">▣</div>
+          </div>
+          <label class="drop" id="dropZone">
+            <span id="dropContent"><span class="upload-icon">↑</span><strong>Drop footage into the timeline</strong><br /><span class="label">MP4, MOV, or WebM. Lumora Motion detects scenes, pacing, dialogue, and visual style automatically.</span></span>
+            <input class="sr-only" id="videoInput" type="file" accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm" />
+          </label>
+          <div class="file-pill">
+            <span id="fileName">lumora-source-reel.mp4</span>
+            <span class="ready" id="uploadState">ready</span>
+            <div class="upload-meta"><span id="fileSize">128.4 MB</span><span id="duration">Duration --:--</span></div>
+            <div class="track" style="margin-top:12px"><div class="bar" id="uploadProgress" style="width:68%;background-image:linear-gradient(90deg,var(--plasma),var(--signal))"></div></div>
+            <div class="upload-actions">
+              <button class="secondary" id="chooseVideo" type="button">Choose video</button>
+              <button class="secondary" id="clearVideo" type="button">Clear upload</button>
+            </div>
+            <div class="label" id="uploadError" style="margin-top:10px;color:#fda4af"></div>
+          </div>
+        </div>
+
+        <div class="panel glass">
+          <div class="form-head">
+            <div><p class="eyebrow">Edit prompt</p><h2>Direct the AI cut</h2></div>
+            <button class="primary" id="generateEdit">* Generate edit</button>
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-tools"><span>Cinematic prompt</span><span id="promptCount">151 chars</span></div>
+            <textarea id="editPrompt">Turn this footage into a polished launch trailer with fast intelligent cuts, neon-grade highlights, clean captions, and a dramatic final product reveal.</textarea>
+          </div>
+          <div class="prompt-chips">
+            <button class="prompt-chip" type="button">Make this a viral TikTok edit</button>
+            <button class="prompt-chip" type="button">Make it cinematic and emotional</button>
+            <button class="prompt-chip" type="button">Add luxury real estate vibe</button>
+            <button class="prompt-chip" type="button">Make it fast-paced with captions</button>
+          </div>
+          <div class="presets">
+            <div class="preset active" data-preset="Viral TikTok"><div class="icon-box" style="background:linear-gradient(135deg,var(--signal),var(--plasma),#fff)">T</div><div class="preset-title">Viral TikTok</div><div class="preset-meta">9:16 edits</div><div class="preset-detail">Jump cuts, captions, beat-synced motion</div></div>
+            <div class="preset" data-preset="Cinematic"><div class="icon-box">C</div><div class="preset-title">Cinematic</div><div class="preset-meta">16:9 grade</div><div class="preset-detail">Trailer pacing, teal highlights, dramatic contrast</div></div>
+            <div class="preset" data-preset="Luxury"><div class="icon-box" style="background:linear-gradient(135deg,var(--aurora),#fff,var(--plasma))">L</div><div class="preset-title">Luxury</div><div class="preset-meta">Premium ad</div><div class="preset-detail">Slow reveals, glossy grade, elegant pacing</div></div>
+            <div class="preset" data-preset="Real Estate"><div class="icon-box" style="background:linear-gradient(135deg,#fff,var(--signal),var(--plasma))">R</div><div class="preset-title">Real Estate</div><div class="preset-meta">Tour polish</div><div class="preset-detail">Clean walkthroughs, daylight lift, smooth pans</div></div>
+            <div class="preset" data-preset="Motivational"><div class="icon-box" style="background:linear-gradient(135deg,#fff,var(--plasma),var(--signal))">M</div><div class="preset-title">Motivational</div><div class="preset-meta">Founder story</div><div class="preset-detail">Bold captions, emotional arc, uplifting rhythm</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="intel">
+        <div class="panel glass">
+          <div class="form-head">
+            <div><p class="eyebrow">AI processing</p><h2>Neural render stack</h2></div>
+            <div class="loader"></div>
+          </div>
+          <div class="steps">
+            <div class="step"><div class="step-head"><strong>Analyzing video</strong><span class="label">queued</span></div><div class="track" style="margin-top:12px"><div class="bar" style="background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div></div>
+            <div class="step"><div class="step-head"><strong>Detecting scenes</strong><span class="label">queued</span></div><div class="track" style="margin-top:12px"><div class="bar" style="background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div></div>
+            <div class="step"><div class="step-head"><strong>Cutting clips</strong><span class="label">queued</span></div><div class="track" style="margin-top:12px"><div class="bar" style="background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div></div>
+            <div class="step"><div class="step-head"><strong>Adding captions</strong><span class="label">queued</span></div><div class="track" style="margin-top:12px"><div class="bar" style="background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div></div>
+            <div class="step"><div class="step-head"><strong>Applying transitions</strong><span class="label">queued</span></div><div class="track" style="margin-top:12px"><div class="bar" style="background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div></div>
+            <div class="step"><div class="step-head"><strong>Enhancing audio</strong><span class="label">queued</span></div><div class="track" style="margin-top:12px"><div class="bar" style="background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div></div>
+            <div class="step"><div class="step-head"><strong>Preparing export</strong><span class="label">queued</span></div><div class="track" style="margin-top:12px"><div class="bar" style="background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div></div>
+          </div>
+        </div>
+
+        <div class="panel glass">
+          <div class="form-head">
+            <div><p class="eyebrow">Creator cockpit</p><h2>Shot intelligence</h2></div>
+            <div style="color:var(--aurora)">▥</div>
+          </div>
+          <div class="shot-grid">
+            <div class="shot"><div class="label">Faces</div><div class="shot-value">locked</div></div>
+            <div class="shot"><div class="label">B-roll</div><div class="shot-value">12 clips</div></div>
+            <div class="shot"><div class="label">Captions</div><div class="shot-value">auto style</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="results glass">
+        <div class="results-head">
+          <div class="form-head">
+            <div>
+              <div class="success">✓ AI render complete</div>
+              <h2 style="font-size:38px;margin-top:16px">Cinematic render results</h2>
+              <p class="label" style="max-width:680px;line-height:1.7">Lumora Motion generated a polished creator-ready cut with captions, transitions, pacing optimization, and export-ready delivery.</p>
+            </div>
+            <div class="burst"><strong style="position:relative;color:var(--plasma)">Neural export sealed</strong></div>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <div>
+            <div class="render-preview">
+              <div class="render-media">
+                <span class="ai-chip">Rendered preview</span>
+                <button class="render-play" aria-label="Play rendered preview">▶</button>
+                <div class="render-timeline">
+                  <div class="form-head"><span>Viral TikTok final cut</span><span>00:38</span></div>
+                  <div class="track" style="margin-top:10px"><div class="bar" style="width:72%;background-image:linear-gradient(90deg,var(--plasma),#fff,var(--aurora))"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="comparison">
+              <div class="form-head">
+                <div><p class="eyebrow">Before / after</p><h2>AI enhancement comparison</h2></div>
+                <span class="label" id="compareValue">58% after</span>
+              </div>
+              <div class="comparison-media" style="margin-top:16px">
+                <div class="after-layer" id="afterLayer"></div>
+                <div class="compare-line" id="compareLine"></div>
+                <span class="chip">Before</span>
+                <span class="ai-chip">After</span>
+              </div>
+              <input id="compareSlider" type="range" min="8" max="92" value="58" style="width:100%;margin-top:16px;accent-color:#67e8f9" aria-label="Before and after comparison" />
+            </div>
+          </div>
+
+          <div>
+            <div class="panel glass" style="padding:20px">
+              <p class="eyebrow">Export quality</p>
+              <div style="display:grid;gap:10px;margin-top:16px">
+                <button class="quality-option" data-time="48 sec"><strong>720p</strong><span class="label">48 sec</span></button>
+                <button class="quality-option active" data-time="1 min 24 sec"><strong>1080p</strong><span class="label">1 min 24 sec</span></button>
+                <button class="quality-option" data-time="3 min 12 sec"><strong>4K Pro</strong><span class="label">3 min 12 sec</span></button>
+              </div>
+              <div class="result-stat" style="margin-top:18px">
+                <div class="label">Estimated render time</div>
+                <div class="shot-value" id="renderTime" style="font-size:32px">1 min 24 sec</div>
+              </div>
+              <button class="primary" style="width:100%;margin-top:18px">↓ Export video</button>
+            </div>
+
+            <div class="panel glass" style="padding:20px;margin-top:18px">
+              <p class="eyebrow">AI stats</p>
+              <div style="display:grid;gap:10px;margin-top:16px">
+                <div class="result-stat"><div class="label">Captions added</div><div class="shot-value">24</div></div>
+                <div class="result-stat"><div class="label">Transitions applied</div><div class="shot-value">18</div></div>
+                <div class="result-stat"><div class="label">Scenes optimized</div><div class="shot-value">32</div></div>
+                <div class="result-stat"><div class="label">Viral score</div><div class="shot-value">94%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="saas-section glass" id="dashboard">
+        <div class="section-title">
+          <p class="eyebrow">Dashboard</p>
+          <h2>Creator command center</h2>
+          <p class="label">Track user projects, recent video edits, AI credits, and plan status.</p>
+        </div>
+        <div class="dashboard-grid">
+          <div class="feature-card">
+            <div class="form-head"><div><p class="label">Current plan</p><div class="shot-value">Pro</div></div><button class="secondary">New Project</button></div>
+            <div class="result-stat" style="margin-top:18px"><div class="label">AI credits remaining</div><div class="shot-value">742 / 1,000</div><div class="track" style="margin-top:12px"><div class="bar" style="width:74%;background-image:linear-gradient(90deg,var(--plasma),var(--signal))"></div></div></div>
+            <div class="label" style="margin-top:12px">Plan options: Free / Pro</div>
+          </div>
+          <div class="feature-card">
+            <div class="preset-title">Recent video edits</div>
+            <div style="display:grid;gap:12px;margin-top:14px">
+              <div class="result-stat"><strong>Product launch reel</strong><div class="label">Viral TikTok · 94% viral score</div></div>
+              <div class="result-stat"><strong>Oceanfront listing tour</strong><div class="label">Real Estate · 32 scenes optimized</div></div>
+              <div class="result-stat"><strong>Founder story cut</strong><div class="label">Motivational · 24 captions added</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="saas-section glass" id="pricing">
+        <div class="section-title">
+          <p class="eyebrow">Pricing</p>
+          <h2>Plans for every creator</h2>
+          <p class="label">Monthly / yearly SaaS pricing mockup with glowing plan cards.</p>
+        </div>
+        <div class="card-grid">
+          <div class="price-card"><div class="preset-title">Free Plan</div><div class="shot-value" style="font-size:42px">$0</div><p class="label">5 AI edits, 720p exports, prompt presets.</p><button class="secondary" style="width:100%;margin-top:16px">Choose plan</button></div>
+          <div class="price-card featured"><div class="preset-title">Pro Creator Plan</div><div class="shot-value" style="font-size:42px">$24/mo</div><p class="label">100 AI edits, 1080p + 4K exports, priority renders.</p><button class="primary" style="width:100%;margin-top:16px">Choose plan</button></div>
+          <div class="price-card"><div class="preset-title">Studio Plan</div><div class="shot-value" style="font-size:42px">$79/mo</div><p class="label">Team workspaces, unlimited projects, advanced analytics.</p><button class="secondary" style="width:100%;margin-top:16px">Choose plan</button></div>
+        </div>
+      </section>
+
+      <section class="saas-section glass">
+        <div class="section-title">
+          <p class="eyebrow">Creators</p>
+          <h2>Trusted by modern video teams</h2>
+        </div>
+        <div class="card-grid">
+          <div class="feature-card"><p class="label">"Lumora Motion turns messy reels into polished campaign cuts instantly."</p><strong>Maya Chen</strong></div>
+          <div class="feature-card"><p class="label">"The prompt flow feels like a production assistant in the browser."</p><strong>Theo Banks</strong></div>
+          <div class="feature-card"><p class="label">"Premium enough to show clients during a pitch."</p><strong>Rina Vale</strong></div>
+        </div>
+      </section>
+
+      <section class="saas-section glass">
+        <div class="section-title">
+          <p class="eyebrow">Auth</p>
+          <h2>Futuristic login and sign up</h2>
+        </div>
+        <div class="card-grid" style="grid-template-columns:repeat(2,1fr)">
+          <div class="auth-card" id="login"><div class="preset-title">Welcome back</div><input placeholder="Email" style="width:100%;margin-top:16px;padding:14px;border-radius:14px;background:rgba(0,0,0,.24);border:1px solid var(--line);color:white"><input placeholder="Password" type="password" style="width:100%;margin-top:10px;padding:14px;border-radius:14px;background:rgba(0,0,0,.24);border:1px solid var(--line);color:white"><button class="primary" style="width:100%;margin-top:14px">Login</button><button class="secondary" style="width:100%;margin-top:10px">Continue with Google</button></div>
+          <div class="auth-card" id="signup"><div class="preset-title">Create your studio</div><input placeholder="Email" style="width:100%;margin-top:16px;padding:14px;border-radius:14px;background:rgba(0,0,0,.24);border:1px solid var(--line);color:white"><input placeholder="Password" type="password" style="width:100%;margin-top:10px;padding:14px;border-radius:14px;background:rgba(0,0,0,.24);border:1px solid var(--line);color:white"><button class="primary" style="width:100%;margin-top:14px">Sign Up</button><button class="secondary" style="width:100%;margin-top:10px">Continue with Apple</button></div>
+        </div>
+      </section>
+
+      <footer class="saas-section glass" style="margin-bottom:0">
+        <div class="form-head"><div class="brand"><span class="mark">*</span><span><strong>Lumora Motion</strong><small>Next-generation AI video editing SaaS MVP</small></span></div><div class="nav-links"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#dashboard">Dashboard</a><a href="#login">Login</a></div></div>
+      </footer>
+    </div>
+    <script>
+      const allowedVideoTypes = ["video/mp4", "video/quicktime", "video/webm"];
+      const allowedVideoExtensions = [".mp4", ".mov", ".webm"];
+      const dropZone = document.getElementById("dropZone");
+      const dropContent = document.getElementById("dropContent");
+      const videoInput = document.getElementById("videoInput");
+      const chooseVideo = document.getElementById("chooseVideo");
+      const clearVideo = document.getElementById("clearVideo");
+      const fileName = document.getElementById("fileName");
+      const fileSize = document.getElementById("fileSize");
+      const duration = document.getElementById("duration");
+      const uploadState = document.getElementById("uploadState");
+      const uploadProgress = document.getElementById("uploadProgress");
+      const uploadError = document.getElementById("uploadError");
+      const editPrompt = document.getElementById("editPrompt");
+      const promptCount = document.getElementById("promptCount");
+      const generateEdit = document.getElementById("generateEdit");
+      const steps = Array.from(document.querySelectorAll(".step"));
+      const compareSlider = document.getElementById("compareSlider");
+      const afterLayer = document.getElementById("afterLayer");
+      const compareLine = document.getElementById("compareLine");
+      const compareValue = document.getElementById("compareValue");
+      const renderTime = document.getElementById("renderTime");
+      const presetPrompts = {
+        "Viral TikTok": "Make this a viral TikTok edit with fast hooks, beat-synced cuts, bold captions, and a strong final callout.",
+        Cinematic: "Make it cinematic and emotional with dramatic pacing, soft film color, music swells, and a memorable closing shot.",
+        Luxury: "Give this a luxury brand edit with elegant motion, premium color grading, slow reveals, and refined transitions.",
+        "Real Estate": "Add luxury real estate vibe with bright interiors, smooth walkthrough pacing, clean labels, and an upscale finish.",
+        Motivational: "Make this motivational with powerful captions, energetic pacing, emotional music, and an inspiring final message."
+      };
+      let activeUrl = "";
+      let progressTimer;
+      let generateTimer;
+
+      function formatDuration(seconds) {
+        if (!seconds || !Number.isFinite(seconds)) return "--:--";
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, "0");
+        return `${minutes}:${remainingSeconds}`;
+      }
+
+      function formatFileSize(bytes) {
+        const megabytes = bytes / 1024 / 1024;
+        return `${megabytes.toFixed(megabytes > 100 ? 0 : 1)} MB`;
+      }
+
+      function isAllowedVideoFile(file) {
+        const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+        return allowedVideoTypes.includes(file.type) || allowedVideoExtensions.includes(extension);
+      }
+
+      function updatePrompt(value) {
+        editPrompt.value = value;
+        promptCount.textContent = `${value.length} chars`;
+      }
+
+      function setStepState(activeIndex) {
+        steps.forEach((step, index) => {
+          const status = step.querySelector(".label");
+          step.classList.toggle("complete", index < activeIndex);
+          step.classList.toggle("active", index === activeIndex);
+          status.textContent = index < activeIndex ? "complete" : index === activeIndex ? "processing" : "queued";
+        });
+      }
+
+      function runGenerateWorkflow() {
+        clearInterval(generateTimer);
+        let activeIndex = 0;
+        generateEdit.textContent = "Generating";
+        setStepState(activeIndex);
+        generateTimer = setInterval(() => {
+          activeIndex += 1;
+          if (activeIndex >= steps.length) {
+            clearInterval(generateTimer);
+            generateEdit.textContent = "* Generate edit";
+            steps.forEach((step) => {
+              step.classList.add("complete");
+              step.classList.remove("active");
+              step.querySelector(".label").textContent = "complete";
+            });
+            return;
+          }
+          setStepState(activeIndex);
+        }, 900);
+      }
+
+      function setProgress() {
+        let progress = 8;
+        uploadState.textContent = "uploading";
+        uploadState.style.color = "var(--plasma)";
+        uploadProgress.style.width = `${progress}%`;
+        clearInterval(progressTimer);
+        progressTimer = setInterval(() => {
+          progress = Math.min(100, progress + Math.random() * 18 + 6);
+          uploadProgress.style.width = `${progress}%`;
+          if (progress >= 100) {
+            clearInterval(progressTimer);
+            uploadState.textContent = "ready";
+            uploadState.style.color = "var(--signal)";
+          }
+        }, 280);
+      }
+
+      function handleVideoFile(file) {
+        if (!file) return;
+        if (!isAllowedVideoFile(file)) {
+          uploadError.textContent = "Upload an MP4, MOV, or WebM video.";
+          return;
+        }
+
+        uploadError.textContent = "";
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        duration.textContent = "Duration --:--";
+        if (activeUrl) URL.revokeObjectURL(activeUrl);
+        activeUrl = URL.createObjectURL(file);
+        dropContent.innerHTML = "";
+        const video = document.createElement("video");
+        video.src = activeUrl;
+        video.controls = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.addEventListener("loadedmetadata", () => {
+          duration.textContent = `Duration ${formatDuration(video.duration)}`;
+        });
+        dropContent.appendChild(video);
+        setProgress();
+      }
+
+      dropZone.addEventListener("dragenter", (event) => {
+        event.preventDefault();
+        dropZone.classList.add("dragging");
+      });
+
+      dropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragging");
+      });
+
+      dropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("dragging");
+        handleVideoFile(event.dataTransfer.files[0]);
+      });
+
+      videoInput.addEventListener("change", (event) => {
+        handleVideoFile(event.target.files[0]);
+      });
+
+      chooseVideo.addEventListener("click", () => videoInput.click());
+
+      editPrompt.addEventListener("input", () => {
+        promptCount.textContent = `${editPrompt.value.length} chars`;
+      });
+
+      document.querySelectorAll(".prompt-chip").forEach((chip) => {
+        chip.addEventListener("click", () => updatePrompt(chip.textContent.trim()));
+      });
+
+      document.querySelectorAll(".preset").forEach((preset) => {
+        preset.addEventListener("click", () => {
+          document.querySelectorAll(".preset").forEach((item) => item.classList.remove("active"));
+          preset.classList.add("active");
+          const name = preset.dataset.preset;
+          if (presetPrompts[name]) updatePrompt(presetPrompts[name]);
+        });
+      });
+
+      generateEdit.addEventListener("click", runGenerateWorkflow);
+
+      compareSlider.addEventListener("input", () => {
+        const value = compareSlider.value;
+        afterLayer.style.width = `${value}%`;
+        compareLine.style.left = `${value}%`;
+        compareValue.textContent = `${value}% after`;
+      });
+
+      document.querySelectorAll(".quality-option").forEach((option) => {
+        option.addEventListener("click", () => {
+          document.querySelectorAll(".quality-option").forEach((item) => item.classList.remove("active"));
+          option.classList.add("active");
+          renderTime.textContent = option.dataset.time;
+        });
+      });
+
+      clearVideo.addEventListener("click", () => {
+        if (activeUrl) URL.revokeObjectURL(activeUrl);
+        activeUrl = "";
+        clearInterval(progressTimer);
+        fileName.textContent = "lumora-source-reel.mp4";
+        fileSize.textContent = "128.4 MB";
+        duration.textContent = "Duration --:--";
+        uploadState.textContent = "ready";
+        uploadState.style.color = "var(--signal)";
+        uploadProgress.style.width = "68%";
+        uploadError.textContent = "";
+        videoInput.value = "";
+        dropContent.innerHTML = '<span class="upload-icon">↑</span><strong>Drop footage into the timeline</strong><br /><span class="label">MP4, MOV, or WebM. Lumora Motion detects scenes, pacing, dialogue, and visual style automatically.</span>';
+      });
+    </script>
+  </body>
+</html>
