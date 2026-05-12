@@ -7,6 +7,13 @@ type RenderStreamEvent =
   | { type: "complete"; outputUrl: string; jobId: string; logs: string[] }
   | { type: "error"; message: string; logs: string[] };
 
+type RenderStatusResponse = {
+  detail?: string;
+  maxUploadBytes?: number;
+  message?: string;
+  mode?: "local" | "remote" | "disabled";
+};
+
 export function useAiRenderWorkflow() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -44,27 +51,60 @@ export function useAiRenderWorkflow() {
     setIsGenerating(true);
     setActiveStep(0);
     setRenderProgress(3);
-    setRenderStatus("Uploading video to render worker");
-    setRenderLogs([`Submitting video to ${brand.name} FFmpeg pipeline...`]);
+    setRenderStatus("Checking render backend");
+    setRenderLogs([`Preparing ${brand.name} render request...`]);
     setRenderError("");
     setOutputUrl("");
 
-    const formData = new FormData();
-    formData.append("video", file);
-    formData.append("preset", preset);
-    formData.append("prompt", prompt);
-    formData.append("quality", selectedQuality);
-    formData.append("trimDuration", String(trimDuration));
-    formData.append("trimStart", String(trimStart));
-
     try {
+      const backendStatus = await getRenderStatus();
+
+      if (backendStatus.mode === "disabled") {
+        const message =
+          backendStatus.message ||
+          "Online video rendering is not available yet. Please run locally or connect a render backend.";
+
+        setRenderError(message);
+        setRenderStatus("Render backend unavailable");
+        setRenderProgress(0);
+        setRenderLogs([
+          message,
+          backendStatus.detail ||
+            "This deployment is configured without a dedicated render worker."
+        ]);
+        return;
+      }
+
+      if (backendStatus.maxUploadBytes && file.size > backendStatus.maxUploadBytes) {
+        throw new Error(
+          `This video is too large for the current render endpoint. Maximum upload size is ${formatBytes(
+            backendStatus.maxUploadBytes
+          )}; selected file is ${formatBytes(file.size)}.`
+        );
+      }
+
+      setRenderProgress(6);
+      setRenderStatus("Uploading video to render worker");
+      setRenderLogs((current) => [
+        ...current,
+        backendStatus.message || `Submitting video to ${brand.name} FFmpeg pipeline...`
+      ]);
+
+      const formData = new FormData();
+      formData.append("video", file);
+      formData.append("preset", preset);
+      formData.append("prompt", prompt);
+      formData.append("quality", selectedQuality);
+      formData.append("trimDuration", String(trimDuration));
+      formData.append("trimStart", String(trimStart));
+
       const response = await fetch("/api/render", {
         method: "POST",
         body: formData
       });
 
       if (!response.ok || !response.body) {
-        throw new Error("Render request failed before processing started.");
+        throw new Error(await readRenderError(response));
       }
 
       const reader = response.body.getReader();
@@ -140,4 +180,38 @@ export function useAiRenderWorkflow() {
     setComparison,
     setSelectedQuality
   };
+}
+
+async function getRenderStatus(): Promise<RenderStatusResponse> {
+  try {
+    const response = await fetch("/api/render/status", { cache: "no-store" });
+    if (!response.ok) return {};
+    return (await response.json()) as RenderStatusResponse;
+  } catch {
+    return {};
+  }
+}
+
+async function readRenderError(response: Response) {
+  const fallback = response.statusText || "Render request failed before processing started.";
+
+  try {
+    const body = await response.clone().json();
+    if (typeof body?.error === "string") return body.error;
+    if (typeof body?.message === "string") return body.message;
+  } catch {
+    // Fall through to plain text parsing.
+  }
+
+  try {
+    const text = await response.text();
+    return text.trim() || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

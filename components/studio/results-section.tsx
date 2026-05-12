@@ -15,6 +15,15 @@ export function ResultsSection(props: {
   onComparison: (value: number) => void;
   onQuality: (value: string) => void;
 }) {
+  const hasOutput = Boolean(props.outputUrl);
+  const hasError = Boolean(props.renderError);
+  const badgeText = hasOutput
+    ? "AI success: render complete"
+    : hasError
+      ? "Render needs attention"
+      : "AI render preview";
+  const headline = hasOutput ? "Cinematic render results" : "Export preview";
+
   return (
     <div id="results" className="mx-auto mt-6 w-full max-w-7xl min-w-0">
       <div className="glass-panel overflow-hidden rounded-3xl">
@@ -23,9 +32,9 @@ export function ResultsSection(props: {
             <div className="min-w-0">
               <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-signal/25 bg-signal/10 px-3 py-2 text-xs font-semibold text-signal sm:text-sm">
                 <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                <span className="truncate">AI success: render complete</span>
+                <span className="truncate">{badgeText}</span>
               </div>
-              <h2 className="mt-4 break-words font-[var(--font-space)] text-2xl font-black text-white sm:text-4xl">Cinematic render results</h2>
+              <h2 className="mt-4 break-words font-[var(--font-space)] text-2xl font-black text-white sm:text-4xl">{headline}</h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">{brand.name} generated a polished creator-ready cut with captions, transitions, pacing optimization, and export-ready delivery.</p>
             </div>
             <div className="render-burst relative grid h-24 w-full min-w-0 place-items-center rounded-2xl border border-plasma/20 bg-black/25 sm:max-w-xs lg:w-64">
