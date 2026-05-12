@@ -17,7 +17,7 @@ export function ProcessingPanel({
   renderStatus: string;
 }) {
   return (
-    <div className="glass-panel rounded-2xl p-5 sm:p-6">
+    <div className="glass-panel min-w-0 rounded-2xl p-5 sm:p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500">AI processing</p>

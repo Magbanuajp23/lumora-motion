@@ -23,7 +23,7 @@ export function UploadPanel(props: {
   onClear: () => void;
 }) {
   return (
-    <div className="glass-panel rounded-2xl p-5 sm:p-6">
+    <div className="glass-panel min-w-0 rounded-2xl p-5 sm:p-6">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Source video</p>
@@ -41,7 +41,7 @@ export function UploadPanel(props: {
         }`}
       >
         {props.videoUrl ? (
-          <video src={props.videoUrl} className="h-full max-h-64 w-full rounded-xl border border-white/10 object-cover shadow-2xl shadow-black/30" controls muted playsInline onLoadedMetadata={(event) => props.onDuration(event.currentTarget.duration)} />
+          <video src={props.videoUrl} className="h-auto max-h-64 w-full max-w-full rounded-xl border border-white/10 object-cover shadow-2xl shadow-black/30" controls muted playsInline onLoadedMetadata={(event) => props.onDuration(event.currentTarget.duration)} />
         ) : (
           <>
             <span className="relative grid h-16 w-16 place-items-center rounded-2xl border border-plasma/30 bg-black/30 text-plasma transition duration-300 group-hover:scale-105">

@@ -10,7 +10,7 @@ export function PricingSection({
   onBilling: (value: "monthly" | "yearly") => void;
 }) {
   return (
-    <section id="pricing" className="relative px-4 py-16 sm:px-6 lg:px-8">
+    <section id="pricing" className="relative overflow-x-hidden px-4 py-16 sm:px-6 lg:px-8">
       <SectionHeader eyebrow="Pricing" title="Hybrid plans with monthly AI credits" copy="Choose a subscription, spend credits on edits, captions, beat sync, VFX, and premium exports." />
       <div className="mx-auto mb-8 flex w-fit rounded-xl border border-white/10 bg-white/[0.04] p-1">
         {(["monthly", "yearly"] as const).map((item) => (
@@ -19,25 +19,25 @@ export function PricingSection({
           </button>
         ))}
       </div>
-      <div className="mx-auto grid max-w-7xl items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mx-auto grid w-full max-w-7xl min-w-0 items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
         {pricingPlans.map((plan) => (
           <div key={plan.name} className={`relative rounded-3xl border p-6 transition duration-300 hover:-translate-y-2 hover:shadow-glow ${
             plan.featured
-              ? "scale-[1.02] border-plasma/70 bg-plasma/[0.08] shadow-[0_0_70px_rgba(32,217,255,.2)]"
+              ? "border-plasma/70 bg-plasma/[0.08] shadow-[0_0_70px_rgba(32,217,255,.2)] xl:scale-[1.02]"
               : "border-white/10 bg-white/[0.045] backdrop-blur-2xl"
           }`}>
             {plan.featured ? (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-plasma/45 bg-[#06101a] px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-plasma shadow-glow">
+              <div className="absolute -top-4 left-1/2 max-w-[calc(100%-2rem)] -translate-x-1/2 whitespace-nowrap rounded-full border border-plasma/45 bg-[#06101a] px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-plasma shadow-glow sm:text-xs sm:tracking-[0.22em]">
                 {plan.tag}
               </div>
             ) : null}
-            <div className="flex items-center justify-between">
-              <h3 className="font-[var(--font-space)] text-2xl font-black text-white">{plan.name}</h3>
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="min-w-0 break-words font-[var(--font-space)] text-2xl font-black text-white">{plan.name}</h3>
               {!plan.featured ? (
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-slate-300">{plan.tag}</span>
+                <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-slate-300">{plan.tag}</span>
               ) : null}
             </div>
-            <div className="mt-6 font-[var(--font-space)] text-5xl font-black text-white">
+            <div className="mt-6 font-[var(--font-space)] text-4xl font-black text-white sm:text-5xl">
               {billing === "monthly" ? plan.monthlyPrice : plan.yearlyPrice}
               {plan.monthlyPrice !== "$0" ? <span className="text-base text-slate-500">/mo</span> : null}
             </div>

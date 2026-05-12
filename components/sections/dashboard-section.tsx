@@ -4,10 +4,10 @@ import { creditBundles, creditCosts, creditSummary, usageHistory } from "@/lib/l
 
 export function DashboardSection() {
   return (
-    <section id="dashboard" className="relative border-y border-white/10 bg-[#03050a]/90 px-4 py-16 sm:px-6 lg:px-8">
+    <section id="dashboard" className="relative overflow-x-hidden border-y border-white/10 bg-[#03050a]/90 px-4 py-16 sm:px-6 lg:px-8">
       <SectionHeader eyebrow="Dashboard" title="Creator credit command center" copy="Track monthly credits, usage history, plan status, and upgrades from a futuristic analytics dashboard." />
-      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <div className="glass-panel rounded-3xl p-6">
+      <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <div className="glass-panel min-w-0 rounded-3xl p-5 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Current plan</p>
@@ -44,10 +44,10 @@ export function DashboardSection() {
             Upgrade Plan
           </button>
         </div>
-        <div className="glass-panel rounded-3xl p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="font-[var(--font-space)] text-2xl font-black text-white">User projects</h3>
-            <span className="rounded-full bg-plasma/10 px-3 py-1 text-sm text-plasma">Recent video edits</span>
+        <div className="glass-panel min-w-0 rounded-3xl p-5 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h3 className="break-words font-[var(--font-space)] text-2xl font-black text-white">User projects</h3>
+            <span className="w-fit rounded-full bg-plasma/10 px-3 py-1 text-sm text-plasma">Recent video edits</span>
           </div>
           <div className="mt-5 grid gap-3">
             {[
@@ -66,11 +66,11 @@ export function DashboardSection() {
           </div>
         </div>
       </div>
-      <div className="mx-auto mt-6 grid max-w-7xl gap-6 lg:grid-cols-3">
-        <div className="glass-panel rounded-3xl p-6 lg:col-span-2">
-          <div className="flex items-center justify-between gap-4">
-            <h3 className="font-[var(--font-space)] text-2xl font-black text-white">Usage history</h3>
-            <span className="rounded-full border border-plasma/25 bg-plasma/10 px-3 py-1 text-sm text-plasma">credit ledger</span>
+      <div className="mx-auto mt-6 grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-3">
+        <div className="glass-panel min-w-0 rounded-3xl p-5 sm:p-6 lg:col-span-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h3 className="break-words font-[var(--font-space)] text-2xl font-black text-white">Usage history</h3>
+            <span className="w-fit rounded-full border border-plasma/25 bg-plasma/10 px-3 py-1 text-sm text-plasma">credit ledger</span>
           </div>
           <div className="mt-5 grid gap-3">
             {usageHistory.map(([project, action, credits, date]) => (
@@ -85,7 +85,7 @@ export function DashboardSection() {
             ))}
           </div>
         </div>
-        <div className="glass-panel rounded-3xl p-6">
+        <div className="glass-panel min-w-0 rounded-3xl p-5 sm:p-6">
           <div className="flex items-center gap-3">
             <Coins className="h-6 w-6 text-plasma" aria-hidden="true" />
             <h3 className="font-[var(--font-space)] text-2xl font-black text-white">Buy More Credits</h3>
@@ -103,7 +103,7 @@ export function DashboardSection() {
           </div>
         </div>
       </div>
-      <div className="mx-auto mt-6 grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto mt-6 grid w-full max-w-7xl min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {creditCosts.map(([label, cost]) => (
           <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 backdrop-blur-xl">
             <Zap className="h-5 w-5 text-signal" aria-hidden="true" />

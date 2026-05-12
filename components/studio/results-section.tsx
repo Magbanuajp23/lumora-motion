@@ -16,28 +16,28 @@ export function ResultsSection(props: {
   onQuality: (value: string) => void;
 }) {
   return (
-    <div id="results" className="mx-auto mt-6 max-w-7xl">
+    <div id="results" className="mx-auto mt-6 w-full max-w-7xl min-w-0">
       <div className="glass-panel overflow-hidden rounded-3xl">
-        <div className="border-b border-white/10 bg-gradient-to-r from-signal/[0.08] via-plasma/[0.08] to-aurora/[0.08] p-5 sm:p-6">
+        <div className="border-b border-white/10 bg-gradient-to-r from-signal/[0.08] via-plasma/[0.08] to-aurora/[0.08] p-4 sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-signal/25 bg-signal/10 px-3 py-2 text-sm font-semibold text-signal">
+            <div className="min-w-0">
+              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-signal/25 bg-signal/10 px-3 py-2 text-xs font-semibold text-signal sm:text-sm">
                 <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                AI success: render complete
+                <span className="truncate">AI success: render complete</span>
               </div>
-              <h2 className="mt-4 font-[var(--font-space)] text-3xl font-black text-white sm:text-4xl">Cinematic render results</h2>
+              <h2 className="mt-4 break-words font-[var(--font-space)] text-2xl font-black text-white sm:text-4xl">Cinematic render results</h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">{brand.name} generated a polished creator-ready cut with captions, transitions, pacing optimization, and export-ready delivery.</p>
             </div>
-            <div className="render-burst relative grid h-24 w-full max-w-xs place-items-center rounded-2xl border border-plasma/20 bg-black/25 lg:w-64">
+            <div className="render-burst relative grid h-24 w-full min-w-0 place-items-center rounded-2xl border border-plasma/20 bg-black/25 sm:max-w-xs lg:w-64">
               <Rocket className="h-8 w-8 text-plasma" aria-hidden="true" />
               <span className="absolute bottom-3 text-xs uppercase tracking-[0.22em] text-slate-500">Neural export sealed</span>
             </div>
           </div>
         </div>
-        <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1.25fr_0.75fr]">
-          <div className="space-y-5">
+        <div className="grid min-w-0 gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
+          <div className="min-w-0 space-y-5">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-              <div className="relative aspect-video min-h-64">
+              <div className="relative aspect-video min-h-0">
                 {props.outputUrl ? (
                   <video
                     src={props.outputUrl}
@@ -55,11 +55,11 @@ export function ResultsSection(props: {
                 )}
                 <div className="scanline pointer-events-none absolute inset-0" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
-                <div className="absolute left-4 top-4 rounded-lg border border-signal/25 bg-signal/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] text-signal backdrop-blur-xl">Generated video result</div>
-                <div className="absolute right-4 top-4 rounded-lg border border-plasma/25 bg-plasma/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] text-plasma backdrop-blur-xl">{brand.watermark}</div>
-                <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/10 bg-black/45 p-3 backdrop-blur-xl">
-                  <div className="flex items-center justify-between text-sm text-slate-300">
-                    <span>{props.selectedPreset} final cut</span>
+                <div className="absolute left-3 top-3 max-w-[62%] rounded-lg border border-signal/25 bg-signal/10 px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-signal backdrop-blur-xl sm:left-4 sm:top-4 sm:px-3 sm:py-2 sm:text-xs sm:tracking-[0.2em]">Generated video result</div>
+                <div className="absolute bottom-3 right-3 max-w-[58%] rounded-lg border border-plasma/25 bg-plasma/10 px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-plasma backdrop-blur-xl sm:right-4 sm:top-4 sm:bottom-auto sm:px-3 sm:py-2 sm:text-xs sm:tracking-[0.2em]">{brand.watermark}</div>
+                <div className="absolute bottom-3 left-3 right-3 rounded-xl border border-white/10 bg-black/45 p-3 backdrop-blur-xl sm:bottom-4 sm:left-4 sm:right-4">
+                  <div className="flex items-center justify-between gap-3 text-xs text-slate-300 sm:text-sm">
+                    <span className="min-w-0 truncate">{props.selectedPreset} final cut</span>
                     <span>{props.outputUrl ? "processed" : "waiting"}</span>
                   </div>
                   <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
@@ -78,10 +78,8 @@ export function ResultsSection(props: {
               </div>
               <div className="relative mt-4 aspect-video overflow-hidden rounded-xl border border-white/10 bg-black">
                 <Image src="/lumora-motion-hero.png" alt="Before video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover grayscale contrast-75 brightness-50" />
-                <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${props.comparison}%` }}>
-                  <div className="relative h-full" style={{ width: "min(78vw, 760px)" }}>
-                    <Image src="/lumora-motion-hero.png" alt="After AI enhanced video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover saturate-150 contrast-125" />
-                  </div>
+                <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - props.comparison}% 0 0)` }}>
+                  <Image src="/lumora-motion-hero.png" alt="After AI enhanced video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover saturate-150 contrast-125" />
                 </div>
                 <div className="absolute inset-y-0 w-px bg-white shadow-glow" style={{ left: `${props.comparison}%` }} />
                 <span className="absolute left-3 top-3 rounded-md bg-black/55 px-2 py-1 text-xs text-slate-300 backdrop-blur">Before</span>
@@ -90,14 +88,14 @@ export function ResultsSection(props: {
               <input type="range" min="8" max="92" value={props.comparison} onChange={(event) => props.onComparison(Number(event.target.value))} className="mt-4 w-full accent-cyan-300" aria-label="Before and after comparison" />
             </div>
           </div>
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
               <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Export quality</p>
               <div className="mt-4 grid gap-2">
                 {renderQualities.map((quality) => (
-                  <button key={quality.label} onClick={() => props.onQuality(quality.label)} className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition duration-300 ${props.selectedQuality === quality.label ? "border-plasma/55 bg-plasma/10 text-white shadow-glow" : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/25"}`}>
+                  <button key={quality.label} onClick={() => props.onQuality(quality.label)} className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition duration-300 ${props.selectedQuality === quality.label ? "border-plasma/55 bg-plasma/10 text-white shadow-glow" : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/25"}`}>
                     <span className="font-bold">{quality.label}</span>
-                    <span className="text-sm text-slate-400">{quality.time}</span>
+                    <span className="shrink-0 text-sm text-slate-400">{quality.time}</span>
                   </button>
                 ))}
               </div>

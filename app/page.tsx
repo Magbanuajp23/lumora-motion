@@ -38,7 +38,7 @@ export default function Home() {
     [selectedPreset]
   );
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#03050a] text-slate-100">
+    <main className="relative min-h-screen w-full overflow-x-hidden bg-[#03050a] text-slate-100">
       <AppBackground />
       <Navbar />
       <HeroSection selectedPreset={selected.name} />
@@ -51,7 +51,7 @@ export default function Home() {
           title="Prompt, process, and export"
           copy={`The core ${brand.name} workflow combines upload, prompt, credit-aware processing, and real FFmpeg export controls.`}
         />
-        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.82fr_1.18fr]">
+        <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
           <UploadPanel
             fileName={upload.fileName}
             fileSize={upload.fileSize}
@@ -98,7 +98,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="mx-auto mt-6 grid max-w-7xl gap-6 lg:grid-cols-[1fr_1.35fr]">
+        <div className="mx-auto mt-6 grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
           <ProcessingPanel
             isGenerating={render.isGenerating}
             activeStep={render.activeStep}

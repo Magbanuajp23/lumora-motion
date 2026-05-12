@@ -33,7 +33,7 @@ export function PromptPanel({
   trimStart: number;
 }) {
   return (
-    <div className="glass-panel rounded-2xl p-5 sm:p-6">
+    <div className="glass-panel min-w-0 rounded-2xl p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Edit prompt</p>
@@ -45,14 +45,14 @@ export function PromptPanel({
         </button>
       </div>
       <div className="mt-6 rounded-3xl border border-white/10 bg-black/25 p-3 shadow-inner shadow-black/40 transition duration-300 focus-within:border-plasma/45 focus-within:shadow-glow">
-        <div className="mb-3 flex items-center justify-between gap-3 border-b border-white/10 px-2 pb-3 text-xs uppercase tracking-[0.2em] text-slate-500">
-          <span className="inline-flex items-center gap-2">
+        <div className="mb-3 flex items-center justify-between gap-3 border-b border-white/10 px-2 pb-3 text-[10px] uppercase tracking-[0.14em] text-slate-500 sm:text-xs sm:tracking-[0.2em]">
+          <span className="inline-flex min-w-0 items-center gap-2">
             <MessageSquareText className="h-4 w-4 text-plasma" aria-hidden="true" />
-            Cinematic prompt
+            <span className="truncate">Cinematic prompt</span>
           </span>
-          <span>{prompt.length} chars</span>
+          <span className="shrink-0">{prompt.length} chars</span>
         </div>
-        <textarea value={prompt} onChange={(event) => onPrompt(event.target.value)} rows={8} className="min-h-72 w-full resize-none bg-transparent p-3 text-lg leading-8 text-slate-100 outline-none placeholder:text-slate-600" placeholder="Describe the edit you want..." />
+        <textarea value={prompt} onChange={(event) => onPrompt(event.target.value)} rows={8} className="min-h-64 w-full resize-none bg-transparent p-3 text-base leading-7 text-slate-100 outline-none placeholder:text-slate-600 sm:min-h-72 sm:text-lg sm:leading-8" placeholder="Describe the edit you want..." />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {promptExamples.map((example) => (

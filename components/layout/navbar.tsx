@@ -6,13 +6,13 @@ const navItems = ["Home", "Features", "Pricing", "Dashboard"];
 export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#03050a]/70 px-4 py-3 backdrop-blur-2xl sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        <a href="#home" className="flex items-center gap-3">
-          <span className="relative grid h-11 w-11 place-items-center rounded-xl border border-plasma/40 bg-plasma/10 shadow-glow">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+        <a href="#home" className="flex min-w-0 flex-1 items-center gap-3">
+          <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-plasma/40 bg-plasma/10 shadow-glow sm:h-11 sm:w-11">
             <Sparkles className="h-5 w-5 text-plasma" aria-hidden="true" />
           </span>
-          <span>
-            <span className="block font-[var(--font-space)] text-xl font-black text-white">
+          <span className="min-w-0">
+            <span className="block truncate font-[var(--font-space)] text-base font-black text-white min-[390px]:text-lg sm:text-xl">
               {brand.name}
             </span>
             <span className="hidden text-xs uppercase tracking-[0.28em] text-slate-500 sm:block">
@@ -27,7 +27,7 @@ export function Navbar() {
             </a>
           ))}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <a
             href="#login"
             className="hidden rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition hover:border-plasma/35 hover:bg-plasma/10 sm:inline-flex"
@@ -36,7 +36,7 @@ export function Navbar() {
           </a>
           <a
             href="#signup"
-            className="rounded-lg bg-white px-4 py-2 text-sm font-black text-[#05070d] transition hover:-translate-y-0.5 hover:bg-slate-200"
+            className="rounded-lg bg-white px-2.5 py-2 text-xs font-black text-[#05070d] transition hover:-translate-y-0.5 hover:bg-slate-200 min-[390px]:px-3 min-[390px]:text-sm sm:px-4"
           >
             Sign Up
           </a>
