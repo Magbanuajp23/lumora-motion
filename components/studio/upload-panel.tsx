@@ -22,6 +22,14 @@ export function UploadPanel(props: {
   onDuration: (duration: number) => void;
   onClear: () => void;
 }) {
+  const hasVideo = Boolean(props.videoUrl);
+  const statusLabel =
+    props.uploadState === "uploading"
+      ? "uploading"
+      : hasVideo
+        ? "ready"
+        : "awaiting file";
+
   return (
     <div className="glass-panel min-w-0 rounded-2xl p-5 sm:p-6">
       <div className="flex items-center justify-between gap-4">
@@ -41,13 +49,20 @@ export function UploadPanel(props: {
         }`}
       >
         {props.videoUrl ? (
-          <video src={props.videoUrl} className="h-auto max-h-64 w-full max-w-full rounded-xl border border-white/10 object-cover shadow-2xl shadow-black/30" controls muted playsInline onLoadedMetadata={(event) => props.onDuration(event.currentTarget.duration)} />
+          <div className="w-full">
+            <video src={props.videoUrl} className="h-auto max-h-64 w-full max-w-full rounded-xl border border-white/10 object-cover shadow-2xl shadow-black/30" controls muted playsInline onLoadedMetadata={(event) => props.onDuration(event.currentTarget.duration)} />
+            <div className="mt-3 grid gap-2 text-left text-xs text-slate-400 sm:grid-cols-3">
+              <span className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">File: <span className="text-white">{props.fileName}</span></span>
+              <span className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">Size: <span className="text-white">{props.fileSize}</span></span>
+              <span className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">Duration: <span className="text-white">{formatDuration(props.duration)}</span></span>
+            </div>
+          </div>
         ) : (
           <>
             <span className="relative grid h-16 w-16 place-items-center rounded-2xl border border-plasma/30 bg-black/30 text-plasma transition duration-300 group-hover:scale-105">
               <Upload className="h-8 w-8" aria-hidden="true" />
             </span>
-            <span className="mt-5 text-lg font-bold text-white">Drop footage into the timeline</span>
+            <span className="mt-5 text-lg font-bold text-white">Drop footage into the editor</span>
             <span className="mt-2 max-w-xs text-sm leading-6 text-slate-400">MP4, MOV, or WebM. {brand.name} detects scenes, pacing, dialogue, and visual style automatically.</span>
           </>
         )}
@@ -59,8 +74,8 @@ export function UploadPanel(props: {
             <Video className="h-4 w-4 shrink-0 text-plasma" aria-hidden="true" />
             <span className="truncate">{props.fileName}</span>
           </span>
-          <span className={`rounded-md px-2 py-1 text-xs font-semibold ${props.uploadState === "uploading" ? "bg-plasma/10 text-plasma" : "bg-signal/10 text-signal"}`}>
-            {props.uploadState === "uploading" ? "uploading" : "ready"}
+          <span className={`rounded-md px-2 py-1 text-xs font-semibold ${props.uploadState === "uploading" ? "bg-plasma/10 text-plasma" : hasVideo ? "bg-signal/10 text-signal" : "bg-white/[0.06] text-slate-400"}`}>
+            {statusLabel}
           </span>
         </div>
         <div className="mt-3 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
@@ -70,6 +85,11 @@ export function UploadPanel(props: {
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
           <div className="h-full rounded-full bg-gradient-to-r from-plasma to-signal animate-bar-shimmer transition-all duration-300" style={{ width: `${props.uploadProgress}%` }} />
         </div>
+        {!hasVideo && !props.uploadError ? (
+          <p className="mt-3 rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-xs leading-5 text-slate-500">
+            Upload a source clip to unlock the Generate Edit workflow.
+          </p>
+        ) : null}
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <button type="button" onClick={() => props.fileInputRef.current?.click()} className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] text-sm font-semibold text-white transition duration-300 hover:border-plasma/40 hover:bg-plasma/10">
             <Upload className="h-4 w-4" aria-hidden="true" />

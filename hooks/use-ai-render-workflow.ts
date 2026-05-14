@@ -30,15 +30,21 @@ export function useAiRenderWorkflow() {
     renderQualities[1].time;
 
   async function generateEdit({
+    captions,
+    captionStyle,
     file,
     preset,
     prompt,
+    showWatermark,
     trimDuration,
     trimStart
   }: {
+    captions: string;
+    captionStyle: string;
     file: File | null;
     preset: string;
     prompt: string;
+    showWatermark: boolean;
     trimDuration: number;
     trimStart: number;
   }) {
@@ -50,9 +56,12 @@ export function useAiRenderWorkflow() {
 
     setIsGenerating(true);
     setActiveStep(0);
-    setRenderProgress(3);
+    setRenderProgress(0);
     setRenderStatus("Checking render backend");
-    setRenderLogs([`Preparing ${brand.name} render request...`]);
+    setRenderLogs([
+      `Preparing ${brand.name} render request...`,
+      "Valid source video detected. Building edit instructions from your prompt."
+    ]);
     setRenderError("");
     setOutputUrl("");
 
@@ -83,17 +92,21 @@ export function useAiRenderWorkflow() {
         );
       }
 
-      setRenderProgress(6);
+      setRenderProgress(4);
       setRenderStatus("Uploading video to render worker");
       setRenderLogs((current) => [
         ...current,
-        backendStatus.message || `Submitting video to ${brand.name} FFmpeg pipeline...`
+        backendStatus.message || `Submitting video to ${brand.name} FFmpeg pipeline...`,
+        `Selected preset: ${preset}. Export quality: ${selectedQuality}.`
       ]);
 
       const formData = new FormData();
       formData.append("video", file);
       formData.append("preset", preset);
       formData.append("prompt", prompt);
+      formData.append("captions", captions);
+      formData.append("captionStyle", captionStyle);
+      formData.append("watermark", String(showWatermark));
       formData.append("quality", selectedQuality);
       formData.append("trimDuration", String(trimDuration));
       formData.append("trimStart", String(trimStart));
@@ -144,7 +157,7 @@ export function useAiRenderWorkflow() {
             setRenderProgress(100);
             setRenderStatus("Render complete");
             setOutputUrl(event.outputUrl);
-            setRenderLogs(event.logs);
+            setRenderLogs([...event.logs, "Generated preview is ready. Export/download is now enabled."]);
             setActiveStep(processingSteps.length - 1);
           }
 

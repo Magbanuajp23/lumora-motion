@@ -4,12 +4,12 @@ import type { UploadState } from "@/lib/types";
 import { formatFileSize, isAllowedVideoFile } from "@/lib/video";
 
 export function useVideoUpload() {
-  const [fileName, setFileName] = useState("lumora-source-reel.mp4");
-  const [fileSize, setFileSize] = useState("128.4 MB");
+  const [fileName, setFileName] = useState("No video uploaded");
+  const [fileSize, setFileSize] = useState("--");
   const [videoUrl, setVideoUrl] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(68);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadState, setUploadState] = useState<UploadState>("ready");
   const [uploadError, setUploadError] = useState("");
@@ -45,6 +45,7 @@ export function useVideoUpload() {
     if (!isAllowedVideoFile(file)) {
       setUploadError("Upload an MP4, MOV, or WebM video.");
       setUploadState("ready");
+      setUploadProgress(0);
       return;
     }
 
@@ -71,11 +72,11 @@ export function useVideoUpload() {
       if (currentUrl) URL.revokeObjectURL(currentUrl);
       return "";
     });
-    setFileName("lumora-source-reel.mp4");
+    setFileName("No video uploaded");
     setVideoFile(null);
-    setFileSize("128.4 MB");
+    setFileSize("--");
     setDuration(null);
-    setUploadProgress(68);
+    setUploadProgress(0);
     setUploadState("ready");
     setUploadError("");
   }

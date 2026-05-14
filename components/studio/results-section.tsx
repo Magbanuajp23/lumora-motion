@@ -12,6 +12,7 @@ export function ResultsSection(props: {
   renderLogs: string[];
   renderProgress: number;
   renderStatus: string;
+  sourceVideoUrl: string;
   onComparison: (value: number) => void;
   onQuality: (value: string) => void;
 }) {
@@ -86,9 +87,27 @@ export function ResultsSection(props: {
                 <span className="text-sm text-slate-400">{props.comparison}% after</span>
               </div>
               <div className="relative mt-4 aspect-video overflow-hidden rounded-xl border border-white/10 bg-black">
-                <Image src="/lumora-motion-hero.png" alt="Before video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover grayscale contrast-75 brightness-50" />
+                {props.sourceVideoUrl ? (
+                  <video
+                    src={props.sourceVideoUrl}
+                    className="absolute inset-0 h-full w-full object-cover grayscale contrast-75 brightness-50"
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <Image src="/lumora-motion-hero.png" alt="Before video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover grayscale contrast-75 brightness-50" />
+                )}
                 <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - props.comparison}% 0 0)` }}>
-                  <Image src="/lumora-motion-hero.png" alt="After AI enhanced video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover saturate-150 contrast-125" />
+                  {props.outputUrl ? (
+                    <video
+                      src={props.outputUrl}
+                      className="absolute inset-0 h-full w-full object-cover saturate-150 contrast-125"
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <Image src="/lumora-motion-hero.png" alt="After AI enhanced video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover saturate-150 contrast-125" />
+                  )}
                 </div>
                 <div className="absolute inset-y-0 w-px bg-white shadow-glow" style={{ left: `${props.comparison}%` }} />
                 <span className="absolute left-3 top-3 rounded-md bg-black/55 px-2 py-1 text-xs text-slate-300 backdrop-blur">Before</span>

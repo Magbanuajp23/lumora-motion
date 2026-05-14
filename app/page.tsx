@@ -14,6 +14,7 @@ import { HeroSection } from "@/components/sections/hero-section";
 import { PricingSection } from "@/components/sections/pricing-section";
 import { TemplatesSection } from "@/components/sections/templates-section";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
+import { TransformationsSection } from "@/components/sections/transformations-section";
 import { DashboardSummary } from "@/components/studio/dashboard-summary";
 import { ProcessingPanel } from "@/components/studio/processing-panel";
 import { PromptPanel } from "@/components/studio/prompt-panel";
@@ -31,6 +32,11 @@ export default function Home() {
   );
   const [trimDuration, setTrimDuration] = useState(12);
   const [trimStart, setTrimStart] = useState(0);
+  const [captions, setCaptions] = useState(
+    "Raw clip to viral cut\nBuilt with Lumora Motion"
+  );
+  const [captionStyle, setCaptionStyle] = useState("tiktok-subtitles");
+  const [showWatermark, setShowWatermark] = useState(true);
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const upload = useVideoUpload();
   const render = useAiRenderWorkflow();
@@ -45,14 +51,15 @@ export default function Home() {
       <Navbar />
       <HeroSection selectedPreset={selected.name} />
       <AiActivitySidebar />
+      <TransformationsSection />
       <DemoSection />
       <FeaturesSection />
 
-      <section id="studio" className="relative px-4 py-16 sm:px-6 lg:px-8">
+      <section id="studio" className="relative scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="AI studio"
-          title="Prompt, process, and export"
-          copy={`The core ${brand.name} workflow combines upload, prompt, credit-aware processing, and real FFmpeg export controls.`}
+          eyebrow="AI editing workspace"
+          title="Upload, prompt, render, export"
+          copy={`The core ${brand.name} workspace combines real upload handling, prompt-driven presets, live processing states, and FFmpeg export controls.`}
         />
         <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
           <UploadPanel
@@ -78,14 +85,24 @@ export default function Home() {
           />
           <PromptPanel
             prompt={prompt}
+            captions={captions}
+            captionStyle={captionStyle}
             selectedPreset={selectedPreset}
             isGenerating={render.isGenerating}
+            canGenerate={Boolean(upload.videoFile)}
+            showWatermark={showWatermark}
             onPrompt={setPrompt}
+            onCaptions={setCaptions}
+            onCaptionStyle={setCaptionStyle}
+            onWatermark={setShowWatermark}
             onGenerate={() =>
               render.generateEdit({
+                captionStyle,
+                captions,
                 file: upload.videoFile,
                 preset: selectedPreset,
                 prompt,
+                showWatermark,
                 trimDuration,
                 trimStart
               })
@@ -123,6 +140,7 @@ export default function Home() {
           renderLogs={render.renderLogs}
           renderProgress={render.renderProgress}
           renderStatus={render.renderStatus}
+          sourceVideoUrl={upload.videoUrl}
           onComparison={render.setComparison}
           onQuality={render.setSelectedQuality}
         />

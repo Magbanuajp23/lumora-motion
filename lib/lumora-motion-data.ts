@@ -15,6 +15,8 @@ export const presetPrompts: Record<string, string> = {
     "Give this a luxury brand edit with elegant motion, premium color grading, slow reveals, and refined transitions.",
   "Real Estate":
     "Add a luxury real estate vibe with bright interiors, smooth walkthrough pacing, clean labels, and an upscale finish.",
+  "Gaming Montage":
+    "Turn this into a gaming montage with phonk energy, beat-synced eliminations, speed ramps, impact zooms, and bold kinetic captions.",
   Motivational:
     "Make this motivational with powerful captions, energetic pacing, emotional music, and an inspiring final message."
 };
@@ -49,6 +51,13 @@ export const presets = [
     icon: "image"
   },
   {
+    name: "Gaming Montage",
+    accent: "from-signal via-aurora to-plasma",
+    meta: "Phonk sync",
+    detail: "Beat drops, speed ramps, impact zooms",
+    icon: "gamepad"
+  },
+  {
     name: "Motivational",
     accent: "from-white via-plasma to-signal",
     meta: "Founder story",
@@ -80,6 +89,29 @@ export const renderQualities = [
   { label: "1080p", time: "1 min 24 sec", credits: 0 },
   { label: "4K Pro", time: "3 min 12 sec", credits: 3 }
 ];
+
+export const captionStyles = [
+  {
+    label: "Bold White",
+    value: "bold-white",
+    detail: "Clean creator captions with a dark glass backing"
+  },
+  {
+    label: "Yellow Highlight",
+    value: "yellow-highlight",
+    detail: "High-retention emphasis for hooks and key phrases"
+  },
+  {
+    label: "Luxury Serif",
+    value: "luxury-serif",
+    detail: "Elegant editorial captions for premium reels"
+  },
+  {
+    label: "TikTok-style Subtitles",
+    value: "tiktok-subtitles",
+    detail: "Punchy short-form subtitles with strong contrast"
+  }
+] as const;
 
 export const creditCosts = [
   ["Basic AI edit", "1 credit"],
@@ -218,6 +250,100 @@ export const creatorStats = [
   ["94%", "top viral score"]
 ] as const;
 
+export const showcaseStats = [
+  ["128K+", "Videos Rendered"],
+  ["42", "AI Presets"],
+  ["1m 18s", "Average Render Time"],
+  ["97%", "Creator Satisfaction"]
+] as const;
+
+export const transformationShowcases = [
+  {
+    title: "Viral TikTok Edit",
+    preset: "Viral TikTok",
+    renderTime: "52 sec",
+    description: "Raw phone footage becomes a hook-first vertical short with kinetic captions, punchy contrast, and beat-style pacing.",
+    beforeLabel: "Phone clip",
+    afterLabel: "Viral cut",
+    beforeNote: "Before: plain phone clip",
+    afterNote: "After: captions, pacing, color grade, and branded output",
+    beforeVideo: "/demo-videos/viral-tiktok-before.mp4",
+    afterVideo: "/demo-videos/viral-tiktok-after.mp4",
+    accent: "from-signal via-plasma to-white",
+    scene: "creator"
+  },
+  {
+    title: "Real Estate Luxury Tour",
+    preset: "Real Estate",
+    renderTime: "1m 34s",
+    description: "A plain walkthrough is transformed into a polished property reel with bright interiors, smooth motion, and premium labels.",
+    beforeLabel: "Walkthrough",
+    afterLabel: "Listing reel",
+    beforeNote: "Before: raw walkthrough footage",
+    afterNote: "After: luxury grade, smooth motion, and listing overlay",
+    beforeVideo: "/demo-videos/real-estate-before.mp4",
+    afterVideo: "/demo-videos/real-estate-after.mp4",
+    accent: "from-white via-signal to-plasma",
+    scene: "estate"
+  },
+  {
+    title: "Gaming Montage",
+    preset: "Gaming Montage",
+    renderTime: "1m 08s",
+    description: "Long gameplay is compressed into a fast phonk-style montage with impact zooms, shake energy, and clutch captions.",
+    beforeLabel: "Raw gameplay",
+    afterLabel: "Impact sync",
+    beforeNote: "Before: unedited gameplay capture",
+    afterNote: "After: impact cuts, zooms, captions, and branded output",
+    beforeVideo: "/demo-videos/gaming-before.mp4",
+    afterVideo: "/demo-videos/gaming-after.mp4",
+    accent: "from-plasma via-aurora to-white",
+    scene: "gaming"
+  },
+  {
+    title: "Cinematic Travel Reel",
+    preset: "Cinematic",
+    renderTime: "1m 22s",
+    description: "Travel clips get an emotional grade, slow zoom feel, trailer-style titles, and smooth fade transitions.",
+    beforeLabel: "Trip clips",
+    afterLabel: "Film reel",
+    beforeNote: "Before: plain travel clips",
+    afterNote: "After: cinematic grade, titles, motion, and watermark",
+    beforeVideo: "/demo-videos/cinematic-before.mp4",
+    afterVideo: "/demo-videos/cinematic-after.mp4",
+    accent: "from-plasma via-white to-aurora",
+    scene: "travel"
+  },
+  {
+    title: "Motivational Edit",
+    preset: "Motivational",
+    renderTime: "58 sec",
+    description: "A simple talking-head clip becomes a high-energy founder short with warm color, bold captions, and dramatic pacing.",
+    beforeLabel: "Raw talk",
+    afterLabel: "Founder short",
+    beforeNote: "Before: raw talking-head footage",
+    afterNote: "After: bold captions, warm grade, and motivational pacing",
+    beforeVideo: "/demo-videos/motivational-before.mp4",
+    afterVideo: "/demo-videos/motivational-after.mp4",
+    accent: "from-white via-plasma to-signal",
+    scene: "motivation"
+  },
+  {
+    title: "Luxury Brand Ad",
+    preset: "Luxury",
+    renderTime: "1m 46s",
+    description: "Product b-roll turns into a premium campaign asset with soft contrast, elegant text, and clean slow-motion feel.",
+    beforeLabel: "Product b-roll",
+    afterLabel: "Brand ad",
+    beforeNote: "Before: raw product b-roll",
+    afterNote: "After: premium grade, elegant titles, and branded output",
+    beforeVideo: "/demo-videos/luxury-before.mp4",
+    afterVideo: "/demo-videos/luxury-after.mp4",
+    accent: "from-aurora via-white to-plasma",
+    scene: "luxury"
+  }
+] as const;
+
 export const demoCategories = [
   {
     name: "TikTok edits",
@@ -309,17 +435,17 @@ export const faqs = [
 export const testimonials = [
   [
     "Maya Chen",
-    "Launch creator",
-    "Lumora Motion turns messy reels into polished campaign cuts before my editor coffee even cools."
+    "Sample launch creator",
+    "Demo quote: Lumora Motion turns messy reels into polished campaign cuts before my editor coffee even cools."
   ],
   [
     "Theo Banks",
-    "Real estate filmmaker",
-    "The prompt flow nails pacing and captions. It feels like a production assistant built into the browser."
+    "Sample real estate filmmaker",
+    "Demo quote: The prompt flow nails pacing and captions. It feels like a production assistant built into the browser."
   ],
   [
     "Rina Vale",
-    "Founder",
-    "This is the first AI editor that feels premium enough to show clients during a pitch."
+    "Sample founder",
+    "Demo quote: This is the first AI editor that feels premium enough to show clients during a pitch."
   ]
 ];

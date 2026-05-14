@@ -29,6 +29,9 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("video");
   const prompt = String(formData.get("prompt") || "");
+  const captions = String(formData.get("captions") || "");
+  const captionStyle = String(formData.get("captionStyle") || "tiktok-subtitles");
+  const watermark = String(formData.get("watermark") ?? "true") !== "false";
   const preset = String(formData.get("preset") || "Cinematic");
   const quality = String(formData.get("quality") || "1080p");
   const trimDuration = Number(formData.get("trimDuration") || "12");
@@ -36,6 +39,13 @@ export async function POST(request: Request) {
 
   if (!(file instanceof File)) {
     return Response.json({ error: "Missing video file." }, { status: 400 });
+  }
+
+  if (!isSupportedVideo(file)) {
+    return Response.json(
+      { error: "Unsupported video format. Upload an MP4, MOV, or WebM file." },
+      { status: 415 }
+    );
   }
 
   if (backend.mode === "remote") {
@@ -78,12 +88,15 @@ export async function POST(request: Request) {
 
       try {
         await renderWithFfmpeg({
+          captionStyle,
+          captions,
           file,
           preset,
           prompt,
           quality,
           trimDuration: Number.isFinite(trimDuration) ? Math.min(Math.max(trimDuration, 3), 60) : 12,
           trimStart: Number.isFinite(trimStart) ? Math.max(trimStart, 0) : 0,
+          watermark,
           onEvent: send
         });
       } catch (error) {
@@ -101,6 +114,16 @@ export async function POST(request: Request) {
       "Content-Type": "application/x-ndjson"
     }
   });
+}
+
+function isSupportedVideo(file: File) {
+  const name = file.name.toLowerCase();
+  return (
+    ["video/mp4", "video/quicktime", "video/webm"].includes(file.type) ||
+    name.endsWith(".mp4") ||
+    name.endsWith(".mov") ||
+    name.endsWith(".webm")
+  );
 }
 
 async function readErrorMessage(response: Response) {

@@ -6,19 +6,12 @@
   - Local:        http://localhost:3000
 
  ✓ Starting...
- ✓ Ready in 2.2s
+ ✓ Ready in 3.7s
  ○ Compiling / ...
- ✓ Compiled / in 5.5s (618 modules)
- GET / 200 in 5799ms
- ✓ Compiled in 447ms (317 modules)
- GET / 200 in 75ms
- GET /?cachebust=1778607906863 200 in 74ms
- GET /?cachebust=1778607906863 200 in 97ms
- GET / 200 in 73ms
- GET / 200 in 83ms
- ✓ Compiled /api/render in 407ms (311 modules)
- POST /api/render 200 in 9937ms
- ✓ Compiled /api/render/[jobId] in 196ms (313 modules)
- GET /api/render/0b6e9d97-09c6-4a41-ae44-39e1cb39dd62 200 in 937ms
- GET /api/render/0b6e9d97-09c6-4a41-ae44-39e1cb39dd62 200 in 54ms
- GET /api/render/0b6e9d97-09c6-4a41-ae44-39e1cb39dd62 200 in 59ms
+ ✓ Compiled / in 9.1s (646 modules)
+ GET / 200 in 9942ms
+ ✓ Compiled in 877ms (331 modules)
+ ✓ Compiled in 203ms (317 modules)
+ GET / 200 in 162ms
+ GET / 200 in 97ms
+ GET / 200 in 416ms

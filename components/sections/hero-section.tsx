@@ -36,6 +36,10 @@ export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
             <Play className="h-4 w-4" aria-hidden="true" />
             Watch Demo
           </a>
+          <a href="#transformations" className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-plasma/25 bg-plasma/10 px-6 text-sm font-bold text-plasma backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-plasma/50 hover:bg-plasma/15 hover:shadow-glow sm:h-12">
+            <Clapperboard className="h-4 w-4" aria-hidden="true" />
+            See AI Transformation
+          </a>
         </div>
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {creatorStats.map(([value, label]) => (
