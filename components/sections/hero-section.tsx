@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { AudioWaveform, Clapperboard, Play, Radio, Sparkles, Wand2, Zap } from "lucide-react";
+import { AudioWaveform, Clapperboard, Play, Radio, Sparkles, Zap } from "lucide-react";
 import { brand, creatorStats } from "@/lib/lumora-motion-data";
 
 export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
@@ -8,10 +8,6 @@ export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
       <div className="pointer-events-none absolute left-1/2 top-8 h-72 w-72 -translate-x-1/2 rounded-full bg-plasma/10 blur-3xl sm:h-[34rem] sm:w-[34rem]" />
       <div className="particle-field pointer-events-none absolute inset-0 opacity-70" />
       <div className="min-w-0 max-w-2xl">
-        <div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-lg border border-plasma/30 bg-plasma/10 px-3 py-2 text-xs text-plasma shadow-glow backdrop-blur-xl sm:mb-6 sm:text-sm">
-          <Wand2 className="h-4 w-4" aria-hidden="true" />
-          <span className="truncate">ChatGPT for viral cinematic video editing</span>
-        </div>
         <h1 className="max-w-full font-[var(--font-space)] text-[2.15rem] font-black leading-[1.02] tracking-normal text-white min-[390px]:text-[2.35rem] sm:text-6xl sm:leading-[0.96] lg:text-8xl">
           <span className="block">Turn Raw Clips</span>
           <span className="block bg-gradient-to-r from-plasma via-white to-aurora bg-clip-text text-transparent">

@@ -1,24 +1,18 @@
-import { Sparkles } from "lucide-react";
 import { brand } from "@/lib/lumora-motion-data";
 
 const navItems = ["Home", "Features", "Pricing", "Dashboard"];
 
 export function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#03050a]/70 px-4 py-3 backdrop-blur-2xl sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#03050a]/70 px-4 py-4 backdrop-blur-2xl sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-        <a href="#home" className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-plasma/40 bg-plasma/10 shadow-glow sm:h-11 sm:w-11">
-            <Sparkles className="h-5 w-5 text-plasma" aria-hidden="true" />
-          </span>
-          <span className="min-w-0">
-            <span className="block truncate font-[var(--font-space)] text-base font-black text-white min-[390px]:text-lg sm:text-xl">
-              {brand.name}
-            </span>
-            <span className="hidden text-xs uppercase tracking-[0.28em] text-slate-500 sm:block">
-              {brand.tagline}
-            </span>
-          </span>
+        <a href="#home" className="flex min-w-0 flex-1 items-center">
+          <img
+            src="/lumora-logo.png"
+            alt={`${brand.name} logo`}
+            className="h-12 w-auto max-w-[260px] shrink-0 object-contain drop-shadow-[0_0_18px_rgba(32,217,255,0.35)] sm:h-16 lg:h-20"
+          />
+          <span className="sr-only">{brand.name}</span>
         </a>
         <div className="hidden items-center gap-5 text-sm font-medium text-slate-300 lg:flex">
           {navItems.map((item) => (
