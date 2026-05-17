@@ -4,11 +4,11 @@ import { templates } from "@/lib/lumora-motion-data";
 
 export function TemplatesSection() {
   return (
-    <section className="relative overflow-hidden px-4 py-16 sm:px-6 lg:px-8">
+    <section id="styles" className="relative overflow-hidden px-4 py-16 sm:px-6 lg:px-8">
       <SectionHeader
-        eyebrow="Templates"
-        title="One-click viral editing systems"
-        copy="Start from cinematic creator templates designed for retention, captions, beat sync, and platform-native pacing."
+        eyebrow="AI editing styles"
+        title="Cinematic styles for every viral format"
+        copy="Choose from creator-ready AI looks designed for retention, captions, beat sync, luxury polish, gaming impact, and platform-native pacing."
       />
       <div className="mx-auto grid w-full max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {templates.map(([name, preview, credits, tags, badge], index) => (

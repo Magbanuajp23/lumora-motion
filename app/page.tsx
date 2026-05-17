@@ -10,8 +10,8 @@ import { FaqSection } from "@/components/sections/faq-section";
 import { FeaturesSection } from "@/components/sections/features-section";
 import { HeroSection } from "@/components/sections/hero-section";
 import { PricingSection } from "@/components/sections/pricing-section";
-import { TemplatesSection } from "@/components/sections/templates-section";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
+import { TransformationsSection } from "@/components/sections/transformations-section";
 import { DashboardSummary } from "@/components/studio/dashboard-summary";
 import { ProcessingPanel } from "@/components/studio/processing-panel";
 import { PromptPanel } from "@/components/studio/prompt-panel";
@@ -42,6 +42,7 @@ export default function Home() {
     () => presets.find((preset) => preset.name === selectedPreset) ?? presets[0],
     [selectedPreset]
   );
+
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-[#03050a] text-slate-100">
       <AppBackground />
@@ -49,13 +50,15 @@ export default function Home() {
       <HeroSection selectedPreset={selected.name} />
       <FeaturesSection />
 
-      <section id="studio" className="relative scroll-mt-24 px-4 py-16 sm:px-6 lg:px-8">
+      <section id="studio" className="relative scroll-mt-24 overflow-hidden border-y border-white/10 bg-[#03050a]/80 px-4 py-16 sm:px-6 lg:px-8">
+        <div className="particle-field pointer-events-none absolute inset-0 opacity-35" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-plasma/10 blur-3xl" />
         <SectionHeader
           eyebrow="AI editing workspace"
           title="Upload, prompt, render, export"
           copy={`The core ${brand.name} workspace combines real upload handling, prompt-driven presets, live processing states, and FFmpeg export controls.`}
         />
-        <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
+        <div className="relative mx-auto grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
           <UploadPanel
             fileName={upload.fileName}
             fileSize={upload.fileSize}
@@ -112,7 +115,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="mx-auto mt-6 grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
+        <div className="relative mx-auto mt-6 grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
           <ProcessingPanel
             isGenerating={render.isGenerating}
             activeStep={render.activeStep}
@@ -140,7 +143,7 @@ export default function Home() {
         />
       </section>
 
-      <TemplatesSection />
+      <TransformationsSection />
       <DashboardSection />
       <PricingSection billing={billing} onBilling={setBilling} />
       <TestimonialsSection />

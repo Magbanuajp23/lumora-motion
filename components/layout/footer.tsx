@@ -15,8 +15,13 @@ export function Footer() {
           </div>
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-          {["Features", "Pricing", "Dashboard", "Login"].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-white">
+          {[
+            ["Studio", "#studio"],
+            ["Dashboard", "#dashboard"],
+            ["Pricing", "#pricing"],
+            ["FAQ", "#faq"]
+          ].map(([item, href]) => (
+            <a key={item} href={href} className="hover:text-white">
               {item}
             </a>
           ))}

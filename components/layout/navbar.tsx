@@ -1,6 +1,11 @@
 import { brand } from "@/lib/lumora-motion-data";
 
-const navItems = ["Home", "Features", "Pricing", "Dashboard"];
+const navItems = [
+  ["Home", "#home"],
+  ["Studio", "#studio"],
+  ["Dashboard", "#dashboard"],
+  ["Pricing", "#pricing"]
+] as const;
 
 export function Navbar() {
   return (
@@ -15,8 +20,8 @@ export function Navbar() {
           <span className="sr-only">{brand.name}</span>
         </a>
         <div className="hidden items-center gap-5 text-sm font-medium text-slate-300 lg:flex">
-          {navItems.map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="transition hover:text-white">
+          {navItems.map(([item, href]) => (
+            <a key={item} href={href} className="transition hover:text-white">
               {item}
             </a>
           ))}

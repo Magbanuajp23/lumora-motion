@@ -3,7 +3,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 
 export function FaqSection() {
   return (
-    <section className="relative px-4 py-16 sm:px-6 lg:px-8">
+    <section id="faq" className="relative px-4 py-16 sm:px-6 lg:px-8">
       <SectionHeader
         eyebrow="FAQ"
         title="Built for credit-aware AI editing"

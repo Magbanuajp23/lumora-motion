@@ -28,7 +28,7 @@ export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             Start Editing
           </a>
-          <a href="#demo" className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.05] px-6 text-sm font-bold text-white backdrop-blur-xl transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 hover:shadow-glow sm:h-12">
+          <a href="#transformations" className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.05] px-6 text-sm font-bold text-white backdrop-blur-xl transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 hover:shadow-glow sm:h-12">
             <Play className="h-4 w-4" aria-hidden="true" />
             Watch Demo
           </a>
