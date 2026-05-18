@@ -24,7 +24,7 @@ export function HeroSection({ selectedPreset }: { selectedPreset: string }) {
           AI-powered editing for creators, gamers, businesses, and viral short-form content.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a href="#studio" className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-black text-[#05070d] shadow-[0_0_48px_rgba(255,255,255,.22)] transition duration-300 hover:-translate-y-0.5 hover:bg-slate-200 sm:h-12">
+          <a href="#signup" className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-black text-[#05070d] shadow-[0_0_48px_rgba(255,255,255,.22)] transition duration-300 hover:-translate-y-0.5 hover:bg-slate-200 sm:h-12">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             Start Editing
           </a>

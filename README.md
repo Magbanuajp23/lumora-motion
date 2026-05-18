@@ -17,6 +17,20 @@ Lumora Motion uses a hybrid subscription + credits model. Plans include monthly 
 - `lib/` - constants, pricing/credits data, shared types, and video utilities.
 - `lib/server/` - backend-only processing helpers, including the FFmpeg render pipeline.
 - `app/api/render/` - video render API and processed video download endpoint.
+- `supabase/email-templates/` - branded Lumora Motion auth email templates and dashboard setup notes.
+
+## Supabase auth
+
+Email/password and Google auth are powered by Supabase. Add the following values to `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Signup confirmation redirects return to the main homepage at `/?auth=confirmed`, where Lumora Motion shows a branded success notice and keeps logged-in users on `/`.
+
+Use `supabase/email-templates/confirmation.html` for the branded confirmation email and follow `supabase/email-templates/README.md` for the Supabase dashboard settings.
 
 ## Video rendering
 

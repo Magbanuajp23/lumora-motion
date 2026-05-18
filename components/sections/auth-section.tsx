@@ -51,6 +51,7 @@ export function AuthSection() {
 
     updateState(mode, { error: "", loading: true, success: "" });
 
+    const redirectTo = `${window.location.origin}/?auth=confirmed`;
     const result =
       mode === "login"
         ? await supabase.auth.signInWithPassword({ email, password })
@@ -58,7 +59,11 @@ export function AuthSection() {
             email,
             password,
             options: {
-              emailRedirectTo: `${window.location.origin}/dashboard`
+              data: {
+                app_name: brand.name,
+                product: "AI video editing studio"
+              },
+              emailRedirectTo: redirectTo
             }
           });
 
@@ -67,12 +72,21 @@ export function AuthSection() {
       return;
     }
 
+    if (mode === "signup" && !result.data.session) {
+      updateState(mode, {
+        error: "",
+        loading: false,
+        success: "Confirmation email sent. Open the Lumora Motion email and confirm your account to unlock the studio."
+      });
+      return;
+    }
+
     updateState(mode, {
       error: "",
       loading: false,
-      success: mode === "login" ? "Logged in. Opening your dashboard..." : "Account created. Opening your dashboard..."
+      success: mode === "login" ? "Logged in. Loading your workspace..." : "Account confirmed. Loading your workspace..."
     });
-    router.push("/dashboard");
+    router.push("/");
   }
 
   async function handleGoogleAuth(mode: AuthMode) {
@@ -88,7 +102,7 @@ export function AuthSection() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/dashboard`
+        redirectTo: `${window.location.origin}/?auth=google`
       }
     });
 
@@ -99,7 +113,7 @@ export function AuthSection() {
 
   return (
     <section className="relative px-4 py-16 sm:px-6 lg:px-8">
-      <SectionHeader eyebrow="Auth" title="Futuristic login and sign up" copy="Create your creator workspace with email or Google OAuth, then jump into the Lumora Motion dashboard." />
+      <SectionHeader eyebrow="Auth" title="Futuristic login and sign up" copy="Create your creator workspace with email or Google OAuth, then launch the Lumora Motion studio." />
       <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
         {[
           ["login", "Welcome back", "Login"] as const,
