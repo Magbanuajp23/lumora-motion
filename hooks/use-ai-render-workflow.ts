@@ -286,12 +286,30 @@ function formatBytes(bytes: number) {
 }
 
 function normalizeOutputUrl(outputUrl: string, backendStatus: RenderStatusResponse) {
-  if (/^https?:\/\//i.test(outputUrl)) return outputUrl;
-
   if (backendStatus.mode === "remote" && backendStatus.directRenderUrl) {
     const backendOrigin = new URL(backendStatus.directRenderUrl).origin;
+
+    if (/^https?:\/\//i.test(outputUrl)) {
+      const parsed = new URL(outputUrl);
+
+      if (isLocalOutputHost(parsed.host)) {
+        const rewritten = `${backendOrigin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+        console.warn("[Lumora Motion] Rewrote local render output URL to production backend URL", {
+          original: outputUrl,
+          rewritten
+        });
+        return rewritten;
+      }
+
+      return outputUrl;
+    }
+
     return `${backendOrigin}${outputUrl.startsWith("/") ? outputUrl : `/${outputUrl}`}`;
   }
 
   return outputUrl;
+}
+
+function isLocalOutputHost(host: string) {
+  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?$/i.test(host);
 }

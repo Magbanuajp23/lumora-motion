@@ -1,6 +1,8 @@
 import { createCorsPreflight, getCorsHeaders } from "@/lib/server/cors";
 import { handleLocalRenderRequest } from "@/lib/server/render-http";
 
+const defaultProductionRenderUrl = "https://lumora-motion-production.up.railway.app";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -29,6 +31,23 @@ function getPublicRenderBaseUrl(request: Request) {
   const configured = process.env.LUMORA_PUBLIC_RENDER_URL?.trim();
   if (configured) return configured;
 
+  const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN?.trim();
+  if (railwayDomain) return `https://${railwayDomain.replace(/^https?:\/\//, "")}`;
+
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  if (forwardedHost && !isLocalHost(forwardedHost)) {
+    return `${forwardedProto || "https"}://${forwardedHost}`;
+  }
+
   const url = new URL(request.url);
+  if (isLocalHost(url.host) && process.env.NODE_ENV === "production") {
+    return defaultProductionRenderUrl;
+  }
+
   return `${url.protocol}//${url.host}`;
+}
+
+function isLocalHost(host: string) {
+  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?$/i.test(host);
 }

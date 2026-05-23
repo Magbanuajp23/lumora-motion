@@ -11,3 +11,5 @@ services:
         value: https://lumora-motion.vercel.app,http://localhost:3000
       - key: LUMORA_MAX_UPLOAD_MB
         value: "250"
+      - key: LUMORA_PUBLIC_RENDER_URL
+        value: https://lumora-motion-production.up.railway.app
