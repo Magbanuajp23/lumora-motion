@@ -46,7 +46,7 @@ export async function handleLocalRenderRequest(
           event.type === "complete" && options.outputBaseUrl
             ? {
                 ...event,
-                outputUrl: `${options.outputBaseUrl.replace(/\/+$/, "")}/api/render/${event.jobId}`
+                outputUrl: `${options.outputBaseUrl.replace(/\/+$/, "")}/render/${event.jobId}`
               }
             : event;
 

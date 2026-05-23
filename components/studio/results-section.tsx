@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useState } from "react";
 import { CheckCircle2, Download, Play, Rocket } from "lucide-react";
 import { aiStats, brand, renderQualities } from "@/lib/lumora-motion-data";
 
@@ -16,6 +17,7 @@ export function ResultsSection(props: {
   onComparison: (value: number) => void;
   onQuality: (value: string) => void;
 }) {
+  const [previewError, setPreviewError] = useState("");
   const hasOutput = Boolean(props.outputUrl);
   const hasError = Boolean(props.renderError);
   const badgeText = hasOutput
@@ -49,12 +51,46 @@ export function ResultsSection(props: {
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
               <div className="relative aspect-video min-h-0">
                 {props.outputUrl ? (
-                  <video
-                    src={props.outputUrl}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    controls
-                    playsInline
-                  />
+                  <>
+                    <video
+                      src={props.outputUrl}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      controls
+                      crossOrigin="anonymous"
+                      onCanPlay={() => {
+                        console.info("[Lumora Motion] Render preview can play", {
+                          outputUrl: props.outputUrl
+                        });
+                        setPreviewError("");
+                      }}
+                      onError={(event) => {
+                        const mediaError = event.currentTarget.error;
+                        const message = mediaError
+                          ? `Video preview could not play this MP4. Media error code ${mediaError.code}.`
+                          : "Video preview could not play this MP4.";
+                        console.error("[Lumora Motion] Render preview failed", {
+                          mediaError,
+                          outputUrl: props.outputUrl
+                        });
+                        setPreviewError(message);
+                      }}
+                      playsInline
+                    />
+                    {previewError ? (
+                      <div className="absolute inset-x-4 top-16 rounded-2xl border border-amber-300/25 bg-black/75 p-4 text-sm leading-6 text-amber-100 backdrop-blur-xl">
+                        <div className="font-bold text-white">Preview playback fallback</div>
+                        <p className="mt-1">{previewError}</p>
+                        <a
+                          href={props.outputUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-flex rounded-xl bg-white px-4 py-2 text-xs font-black text-[#05070d] transition hover:bg-slate-200"
+                        >
+                          Open rendered MP4
+                        </a>
+                      </div>
+                    ) : null}
+                  </>
                 ) : (
                   <>
                     <Image src="/lumora-motion-hero.png" alt="Rendered Lumora Motion video result" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover opacity-95" />
@@ -151,6 +187,16 @@ export function ResultsSection(props: {
                 <Download className="h-4 w-4" aria-hidden="true" />
                 Export / Download
               </a>
+              {props.outputUrl ? (
+                <a
+                  href={props.outputUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-bold text-white transition duration-300 hover:border-plasma/35 hover:bg-plasma/10"
+                >
+                  Download Rendered Video
+                </a>
+              ) : null}
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/25 p-5">
               <p className="text-sm uppercase tracking-[0.2em] text-slate-500">AI stats</p>

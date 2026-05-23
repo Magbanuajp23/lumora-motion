@@ -4,7 +4,7 @@ import { brand, processingSteps, renderQualities } from "@/lib/lumora-motion-dat
 type RenderStreamEvent =
   | { type: "log"; message: string }
   | { type: "progress"; progress: number; step: string }
-  | { type: "complete"; outputUrl: string; jobId: string; logs: string[] }
+  | { type: "complete"; outputUrl?: string; downloadUrl?: string; jobId: string; logs: string[] }
   | { type: "error"; message: string; logs: string[] };
 
 type RenderStatusResponse = {
@@ -194,10 +194,23 @@ export function useAiRenderWorkflow() {
           }
 
           if (event.type === "complete") {
+            const finalOutputUrl = normalizeOutputUrl(
+              event.outputUrl || event.downloadUrl || `/api/render/${event.jobId}`,
+              backendStatus
+            );
+
+            console.info("[Lumora Motion] Render complete event", {
+              event,
+              finalOutputUrl
+            });
             setRenderProgress(100);
             setRenderStatus("Render complete");
-            setOutputUrl(event.outputUrl);
-            setRenderLogs([...event.logs, "Generated preview is ready. Export/download is now enabled."]);
+            setOutputUrl(finalOutputUrl);
+            setRenderLogs([
+              ...event.logs,
+              `Generated preview URL: ${finalOutputUrl}`,
+              "Generated preview is ready. Export/download is now enabled."
+            ]);
             setActiveStep(processingSteps.length - 1);
           }
 
@@ -270,4 +283,15 @@ async function readRenderError(response: Response) {
 function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function normalizeOutputUrl(outputUrl: string, backendStatus: RenderStatusResponse) {
+  if (/^https?:\/\//i.test(outputUrl)) return outputUrl;
+
+  if (backendStatus.mode === "remote" && backendStatus.directRenderUrl) {
+    const backendOrigin = new URL(backendStatus.directRenderUrl).origin;
+    return `${backendOrigin}${outputUrl.startsWith("/") ? outputUrl : `/${outputUrl}`}`;
+  }
+
+  return outputUrl;
 }

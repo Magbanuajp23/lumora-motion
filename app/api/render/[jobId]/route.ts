@@ -32,7 +32,7 @@ export async function GET(
   const jobId = params.jobId.replace(/[^a-z0-9-]/gi, "");
 
   if (backend.mode === "remote") {
-    const response = await fetch(`${backend.remoteRenderUrl}/api/render/${jobId}`, {
+    const response = await fetch(`${backend.remoteRenderUrl}/render/${jobId}`, {
       cache: "no-store"
     });
 
