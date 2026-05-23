@@ -1,0 +1,8 @@
+.git
+.next
+.lumora-motion-renders
+node_modules
+npm-debug.log
+mobile-*.png
+preview.html
+*.mp4

@@ -2,6 +2,7 @@ export const PRODUCTION_RENDER_UNAVAILABLE_MESSAGE =
   "Online video rendering is not available yet. Please run locally or connect a render backend.";
 
 const rawRemoteRenderUrl = process.env.LUMORA_RENDER_BACKEND_URL?.trim();
+const configuredMaxUploadMb = Number(process.env.LUMORA_MAX_UPLOAD_MB || "250");
 
 export type RenderBackendMode = "local" | "remote" | "disabled";
 
@@ -17,7 +18,7 @@ export function getRenderBackendConfig() {
       detail:
         "A remote render backend is configured. Lumora Motion will forward render jobs to that service.",
       isVercel,
-      maxUploadBytes: 4.5 * 1024 * 1024,
+      maxUploadBytes: Math.max(1, configuredMaxUploadMb) * 1024 * 1024,
       message: "Remote Lumora Motion rendering is available.",
       mode: "remote" as RenderBackendMode,
       remoteRenderUrl

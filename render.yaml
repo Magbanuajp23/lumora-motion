@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: lumora-motion-render
+    env: docker
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LUMORA_ALLOWED_ORIGINS
+        value: https://lumora-motion.vercel.app,http://localhost:3000
+      - key: LUMORA_MAX_UPLOAD_MB
+        value: "250"

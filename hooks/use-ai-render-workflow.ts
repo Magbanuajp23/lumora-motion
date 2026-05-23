@@ -8,10 +8,17 @@ type RenderStreamEvent =
   | { type: "error"; message: string; logs: string[] };
 
 type RenderStatusResponse = {
+  directRenderUrl?: string | null;
   detail?: string;
   maxUploadBytes?: number;
   message?: string;
   mode?: "local" | "remote" | "disabled";
+  remoteHealth?: {
+    error?: string;
+    ok: boolean;
+    status?: number;
+    url: string;
+  } | null;
 };
 
 export function useAiRenderWorkflow() {
@@ -67,6 +74,7 @@ export function useAiRenderWorkflow() {
 
     try {
       const backendStatus = await getRenderStatus();
+      console.info("[Lumora Motion] Render backend status", backendStatus);
 
       if (backendStatus.mode === "disabled") {
         const message =
@@ -82,6 +90,14 @@ export function useAiRenderWorkflow() {
             "This deployment is configured without a dedicated render worker."
         ]);
         return;
+      }
+
+      if (backendStatus.mode === "remote" && backendStatus.remoteHealth?.ok === false) {
+        throw new Error(
+          `Render backend health check failed at ${backendStatus.remoteHealth.url}. ${
+            backendStatus.remoteHealth.error || `Status ${backendStatus.remoteHealth.status || "unknown"}`
+          }`
+        );
       }
 
       if (backendStatus.maxUploadBytes && file.size > backendStatus.maxUploadBytes) {
@@ -111,13 +127,37 @@ export function useAiRenderWorkflow() {
       formData.append("trimDuration", String(trimDuration));
       formData.append("trimStart", String(trimStart));
 
-      const response = await fetch("/api/render", {
+      const renderEndpoint =
+        backendStatus.mode === "remote" && backendStatus.directRenderUrl
+          ? backendStatus.directRenderUrl
+          : "/api/render";
+
+      setRenderLogs((current) => [
+        ...current,
+        backendStatus.mode === "remote"
+          ? "Uploading directly to the production FFmpeg render backend to avoid Vercel upload limits."
+          : "Using the local Lumora Motion FFmpeg render route."
+      ]);
+      console.info("[Lumora Motion] Submitting render job", {
+        endpoint: renderEndpoint,
+        fileSize: file.size,
+        preset,
+        quality: selectedQuality
+      });
+
+      const response = await fetch(renderEndpoint, {
         method: "POST",
         body: formData
       });
 
       if (!response.ok || !response.body) {
-        throw new Error(await readRenderError(response));
+        const message = await readRenderError(response);
+        console.error("[Lumora Motion] Render request failed", {
+          endpoint: renderEndpoint,
+          message,
+          status: response.status
+        });
+        throw new Error(message);
       }
 
       const reader = response.body.getReader();
@@ -162,6 +202,7 @@ export function useAiRenderWorkflow() {
           }
 
           if (event.type === "error") {
+            console.error("[Lumora Motion] Render worker returned an error", event);
             setRenderError(event.message);
             setRenderStatus("Render failed");
             setRenderLogs(event.logs);
@@ -171,6 +212,7 @@ export function useAiRenderWorkflow() {
         }
       }
     } catch (error) {
+      console.error("[Lumora Motion] Generate Edit failed", error);
       setRenderError(error instanceof Error ? error.message : "Render failed.");
       setRenderStatus("Render failed");
     } finally {
@@ -200,7 +242,8 @@ async function getRenderStatus(): Promise<RenderStatusResponse> {
     const response = await fetch("/api/render/status", { cache: "no-store" });
     if (!response.ok) return {};
     return (await response.json()) as RenderStatusResponse;
-  } catch {
+  } catch (error) {
+    console.error("[Lumora Motion] Could not read render status", error);
     return {};
   }
 }

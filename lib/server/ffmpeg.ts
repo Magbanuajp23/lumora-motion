@@ -149,6 +149,33 @@ function resolveFfprobeCommand(ffmpegCommand: string) {
   return "ffprobe";
 }
 
+export async function getFfmpegHealth() {
+  const ffmpegCommand = resolveFfmpegCommand();
+  const ffprobeCommand = resolveFfprobeCommand(ffmpegCommand);
+
+  try {
+    const [ffmpegVersion, ffprobeVersion] = await Promise.all([
+      runCommandWithOutput(ffmpegCommand, ["-version"]),
+      runCommandWithOutput(ffprobeCommand, ["-version"])
+    ]);
+
+    return {
+      available: true,
+      ffmpegCommand,
+      ffmpegVersion: ffmpegVersion.split(/\r?\n/)[0] || "ffmpeg available",
+      ffprobeCommand,
+      ffprobeVersion: ffprobeVersion.split(/\r?\n/)[0] || "ffprobe available"
+    };
+  } catch (error) {
+    return {
+      available: false,
+      error: error instanceof Error ? error.message : "FFmpeg health check failed.",
+      ffmpegCommand,
+      ffprobeCommand
+    };
+  }
+}
+
 async function probeVideoDuration(inputPath: string, ffprobeCommand: string) {
   const output = await runCommandWithOutput(ffprobeCommand, [
     "-v",

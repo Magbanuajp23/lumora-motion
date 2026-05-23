@@ -48,17 +48,22 @@ Install FFmpeg and ensure `ffmpeg`/`ffprobe` are available on `PATH`, or use the
 
 Vercel is not used as the bundled FFmpeg render worker. Video uploads are commonly larger than Vercel Function payload limits, and long CPU-heavy FFmpeg jobs are a better fit for a dedicated render service.
 
-On Vercel, Lumora Motion now returns a clear product message instead of attempting local FFmpeg:
+On Vercel, Lumora Motion checks `/api/render/status`. If `LUMORA_RENDER_BACKEND_URL` is configured, the browser uploads directly to the remote `/render` endpoint so large videos do not pass through Vercel functions. If no backend is configured, the app returns a clear product message instead of attempting local FFmpeg:
 
 `Online video rendering is not available yet. Please run locally or connect a render backend.`
 
-Future backend integration is prepared with:
+Production backend integration uses:
 
-- `LUMORA_RENDER_BACKEND_URL` - forwards `/api/render` jobs to a dedicated render server endpoint at `/render`.
+- `LUMORA_RENDER_BACKEND_URL` - the public URL of the render backend, for example `https://lumora-motion-render.up.railway.app`.
+- `LUMORA_PUBLIC_RENDER_URL` - set on the backend if its public URL differs from the request host.
+- `LUMORA_ALLOWED_ORIGINS` - comma-separated frontend origins allowed to call the backend, for example `https://lumora-motion.vercel.app,http://localhost:3000`.
+- `LUMORA_MAX_UPLOAD_MB` - maximum upload size shown in the frontend, default `250`.
 - `DISABLE_LOCAL_RENDER=1` - disables local FFmpeg rendering in any environment.
 - `lib/server/render-config.ts` - central render mode detection for local, remote, and disabled deployments.
+- `/api/health` - render backend health endpoint with FFmpeg/FFprobe availability.
+- `/render` - direct production FFmpeg render endpoint with CORS.
 
-For production-scale uploads, the next backend should use direct object storage uploads plus an asynchronous render job API on Railway, Render, RunPod, or another worker host.
+Deploy the backend with the included Dockerfile on Railway or Render. The container installs FFmpeg and runs the same Next.js API routes as a dedicated render worker. For higher-scale production, the next step is direct object storage uploads plus an asynchronous queue-backed worker on Railway, Render, RunPod, or similar infrastructure.
 
 ## Run locally
 
