@@ -5,7 +5,6 @@ import { aiStats, brand, renderQualities } from "@/lib/lumora-motion-data";
 
 export function ResultsSection(props: {
   selectedPreset: string;
-  comparison: number;
   selectedQuality: string;
   renderTime: string;
   outputUrl: string;
@@ -13,8 +12,6 @@ export function ResultsSection(props: {
   renderLogs: string[];
   renderProgress: number;
   renderStatus: string;
-  sourceVideoUrl: string;
-  onComparison: (value: number) => void;
   onQuality: (value: string) => void;
 }) {
   const [previewError, setPreviewError] = useState("");
@@ -113,43 +110,6 @@ export function ResultsSection(props: {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Before / after</p>
-                  <h3 className="mt-1 font-[var(--font-space)] text-xl font-bold text-white">AI enhancement comparison</h3>
-                </div>
-                <span className="text-sm text-slate-400">{props.comparison}% after</span>
-              </div>
-              <div className="relative mt-4 min-h-[320px] overflow-hidden rounded-xl border border-white/10 bg-black sm:min-h-[520px]">
-                {props.sourceVideoUrl ? (
-                  <video
-                    src={props.sourceVideoUrl}
-                    className="absolute inset-0 h-full w-full object-contain grayscale contrast-75 brightness-50"
-                    muted
-                    playsInline
-                  />
-                ) : (
-                  <Image src="/lumora-motion-hero.png" alt="Before video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover grayscale contrast-75 brightness-50" />
-                )}
-                <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - props.comparison}% 0 0)` }}>
-                  {props.outputUrl ? (
-                    <video
-                      src={props.outputUrl}
-                      className="absolute inset-0 h-full w-full object-contain saturate-150 contrast-125"
-                      muted
-                      playsInline
-                    />
-                  ) : (
-                    <Image src="/lumora-motion-hero.png" alt="After AI enhanced video frame" fill sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover saturate-150 contrast-125" />
-                  )}
-                </div>
-                <div className="absolute inset-y-0 w-px bg-white shadow-glow" style={{ left: `${props.comparison}%` }} />
-                <span className="absolute left-3 top-3 rounded-md bg-black/55 px-2 py-1 text-xs text-slate-300 backdrop-blur">Before</span>
-                <span className="absolute right-3 top-3 rounded-md bg-plasma/15 px-2 py-1 text-xs text-plasma backdrop-blur">After</span>
-              </div>
-              <input type="range" min="8" max="92" value={props.comparison} onChange={(event) => props.onComparison(Number(event.target.value))} className="mt-4 w-full accent-cyan-300" aria-label="Before and after comparison" />
             </div>
           </div>
           <div className="min-w-0 space-y-5">

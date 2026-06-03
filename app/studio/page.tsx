@@ -144,7 +144,6 @@ export default function StudioPage() {
 
           <ResultsSection
             selectedPreset={selectedPreset}
-            comparison={render.comparison}
             selectedQuality={render.selectedQuality}
             renderTime={render.renderTime}
             outputUrl={render.outputUrl}
@@ -152,8 +151,6 @@ export default function StudioPage() {
             renderLogs={render.renderLogs}
             renderProgress={render.renderProgress}
             renderStatus={render.renderStatus}
-            sourceVideoUrl={upload.videoUrl}
-            onComparison={render.setComparison}
             onQuality={render.setSelectedQuality}
           />
         </div>

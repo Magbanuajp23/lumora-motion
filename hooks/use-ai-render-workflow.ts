@@ -24,7 +24,6 @@ type RenderStatusResponse = {
 export function useAiRenderWorkflow() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-  const [comparison, setComparison] = useState(58);
   const [selectedQuality, setSelectedQuality] = useState("1080p");
   const [renderProgress, setRenderProgress] = useState(0);
   const [renderStatus, setRenderStatus] = useState("Waiting for uploaded video");
@@ -237,7 +236,6 @@ export function useAiRenderWorkflow() {
 
   return {
     activeStep,
-    comparison,
     generateEdit,
     isGenerating,
     outputUrl,
@@ -247,7 +245,6 @@ export function useAiRenderWorkflow() {
     renderProgress,
     renderStatus,
     selectedQuality,
-    setComparison,
     setSelectedQuality
   };
 }
