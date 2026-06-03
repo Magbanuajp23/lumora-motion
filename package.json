@@ -5,6 +5,7 @@
     "build": "next build",
     "start": "next start",
     "test:render-geometry": "node --test test/render-geometry.test.mjs",
+    "test:video-orientation": "node --test test/video-orientation.test.mjs",
     "lint": "next lint"
   },
   "dependencies": {

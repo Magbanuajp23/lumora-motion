@@ -81,6 +81,7 @@ export default function Home() {
               fileName={upload.fileName}
               fileSize={upload.fileSize}
               duration={upload.duration}
+              videoMetadata={upload.videoMetadata}
               videoUrl={upload.videoUrl}
               uploadProgress={upload.uploadProgress}
               uploadState={upload.uploadState}
@@ -95,7 +96,7 @@ export default function Home() {
               onDragOver={(event) => event.preventDefault()}
               onDragLeave={() => upload.setIsDragging(false)}
               onFile={upload.handleVideoFile}
-              onDuration={upload.setDuration}
+              onVideoMetadata={upload.handleVideoMetadata}
               onClear={upload.resetUpload}
             />
             <PromptPanel

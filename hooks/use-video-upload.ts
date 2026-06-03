@@ -2,6 +2,15 @@ import type { DragEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { UploadState } from "@/lib/types";
 import { formatFileSize, isAllowedVideoFile } from "@/lib/video";
+import { detectVideoOrientation } from "@/lib/video-orientation";
+
+type VideoOrientation = "landscape" | "portrait" | "square" | "unknown";
+
+type UploadedVideoMetadata = {
+  height: number;
+  orientation: VideoOrientation;
+  width: number;
+};
 
 export function useVideoUpload() {
   const [fileName, setFileName] = useState("No video uploaded");
@@ -9,6 +18,11 @@ export function useVideoUpload() {
   const [videoUrl, setVideoUrl] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
+  const [videoMetadata, setVideoMetadata] = useState<UploadedVideoMetadata>({
+    height: 0,
+    orientation: "unknown",
+    width: 0
+  });
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadState, setUploadState] = useState<UploadState>("ready");
@@ -54,6 +68,7 @@ export function useVideoUpload() {
     setVideoFile(file);
     setFileSize(formatFileSize(file.size));
     setDuration(null);
+    setVideoMetadata({ height: 0, orientation: "unknown", width: 0 });
     setUploadState("uploading");
     setVideoUrl((currentUrl) => {
       if (currentUrl) URL.revokeObjectURL(currentUrl);
@@ -76,9 +91,19 @@ export function useVideoUpload() {
     setVideoFile(null);
     setFileSize("--");
     setDuration(null);
+    setVideoMetadata({ height: 0, orientation: "unknown", width: 0 });
     setUploadProgress(0);
     setUploadState("ready");
     setUploadError("");
+  }
+
+  function handleVideoMetadata(duration: number, width: number, height: number) {
+    setDuration(duration);
+    setVideoMetadata({
+      height,
+      orientation: detectVideoOrientation(width, height),
+      width
+    });
   }
 
   return {
@@ -92,10 +117,12 @@ export function useVideoUpload() {
     resetUpload,
     setDuration,
     setIsDragging,
+    handleVideoMetadata,
     uploadError,
     uploadProgress,
     uploadState,
     videoFile,
+    videoMetadata,
     videoUrl
   };
 }

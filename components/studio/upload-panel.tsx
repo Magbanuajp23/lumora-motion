@@ -8,6 +8,11 @@ export function UploadPanel(props: {
   fileName: string;
   fileSize: string;
   duration: number | null;
+  videoMetadata: {
+    height: number;
+    orientation: "landscape" | "portrait" | "square" | "unknown";
+    width: number;
+  };
   videoUrl: string;
   uploadProgress: number;
   uploadState: UploadState;
@@ -19,10 +24,11 @@ export function UploadPanel(props: {
   onDragOver: (event: DragEvent<HTMLLabelElement>) => void;
   onDragLeave: () => void;
   onFile: (file?: File) => void;
-  onDuration: (duration: number) => void;
+  onVideoMetadata: (duration: number, width: number, height: number) => void;
   onClear: () => void;
 }) {
   const hasVideo = Boolean(props.videoUrl);
+  const previewFrameClass = getPreviewFrameClass(props.videoMetadata.orientation);
   const statusLabel =
     props.uploadState === "uploading"
       ? "uploading"
@@ -50,12 +56,31 @@ export function UploadPanel(props: {
       >
         {props.videoUrl ? (
           <div className="w-full">
-            <video src={props.videoUrl} className="h-auto max-h-64 w-full max-w-full rounded-xl border border-white/10 object-cover shadow-2xl shadow-black/30" controls muted playsInline onLoadedMetadata={(event) => props.onDuration(event.currentTarget.duration)} />
+            <div className={previewFrameClass}>
+              <video
+                src={props.videoUrl}
+                className="h-full w-full rounded-xl object-contain"
+                controls
+                muted
+                playsInline
+                onLoadedMetadata={(event) => {
+                  const video = event.currentTarget;
+                  props.onVideoMetadata(video.duration, video.videoWidth, video.videoHeight);
+                }}
+              />
+            </div>
             <div className="mt-3 grid gap-2 text-left text-xs text-slate-400 sm:grid-cols-3">
               <span className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">File: <span className="text-white">{props.fileName}</span></span>
               <span className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">Size: <span className="text-white">{props.fileSize}</span></span>
               <span className="rounded-lg border border-white/10 bg-black/25 px-3 py-2">Duration: <span className="text-white">{formatDuration(props.duration)}</span></span>
             </div>
+            {props.videoMetadata.orientation !== "unknown" ? (
+              <div className="mt-3 rounded-lg border border-plasma/15 bg-plasma/[0.06] px-3 py-2 text-left text-xs text-slate-400">
+                Preview: <span className="text-white">{props.videoMetadata.orientation}</span>
+                <span className="text-slate-500"> · </span>
+                <span className="text-white">{props.videoMetadata.width}x{props.videoMetadata.height}</span>
+              </div>
+            ) : null}
           </div>
         ) : (
           <>
@@ -105,4 +130,19 @@ export function UploadPanel(props: {
       </div>
     </div>
   );
+}
+
+function getPreviewFrameClass(orientation: "landscape" | "portrait" | "square" | "unknown") {
+  const base =
+    "mx-auto overflow-hidden rounded-xl border border-white/10 bg-black shadow-2xl shadow-black/30";
+
+  if (orientation === "portrait") {
+    return `${base} aspect-[9/16] max-h-[70vh] w-full max-w-[min(100%,24rem)]`;
+  }
+
+  if (orientation === "square") {
+    return `${base} aspect-square w-full max-w-[min(100%,34rem)]`;
+  }
+
+  return `${base} aspect-video w-full`;
 }
