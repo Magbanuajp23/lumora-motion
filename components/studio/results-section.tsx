@@ -49,12 +49,12 @@ export function ResultsSection(props: {
         <div className="grid min-w-0 gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
           <div className="min-w-0 space-y-5">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-              <div className="relative aspect-video min-h-0">
+              <div className="relative min-h-[320px] bg-black sm:min-h-[520px]">
                 {props.outputUrl ? (
                   <>
                     <video
                       src={props.outputUrl}
-                      className="absolute inset-0 h-full w-full object-cover"
+                      className="absolute inset-0 h-full w-full object-contain"
                       controls
                       crossOrigin="anonymous"
                       onCanPlay={() => {
@@ -122,11 +122,11 @@ export function ResultsSection(props: {
                 </div>
                 <span className="text-sm text-slate-400">{props.comparison}% after</span>
               </div>
-              <div className="relative mt-4 aspect-video overflow-hidden rounded-xl border border-white/10 bg-black">
+              <div className="relative mt-4 min-h-[320px] overflow-hidden rounded-xl border border-white/10 bg-black sm:min-h-[520px]">
                 {props.sourceVideoUrl ? (
                   <video
                     src={props.sourceVideoUrl}
-                    className="absolute inset-0 h-full w-full object-cover grayscale contrast-75 brightness-50"
+                    className="absolute inset-0 h-full w-full object-contain grayscale contrast-75 brightness-50"
                     muted
                     playsInline
                   />
@@ -137,7 +137,7 @@ export function ResultsSection(props: {
                   {props.outputUrl ? (
                     <video
                       src={props.outputUrl}
-                      className="absolute inset-0 h-full w-full object-cover saturate-150 contrast-125"
+                      className="absolute inset-0 h-full w-full object-contain saturate-150 contrast-125"
                       muted
                       playsInline
                     />

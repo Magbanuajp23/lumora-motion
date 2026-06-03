@@ -419,7 +419,8 @@ export async function renderWithFfmpeg({
   log("Beta render safety enabled: output is orientation-aware, capped for beta, and never upscaled above source dimensions.");
   log(`Applying ${preset} style engine: ${renderPlan.description}.`);
   log(watermark ? "Free-plan watermark overlay enabled." : "Watermark overlay disabled for paid demo export.");
-  log(`FFmpeg arguments prepared: -ss ${safeTrimStart.toFixed(2)} -t ${safeTrimDuration.toFixed(2)} -vf [Lumora Motion filter graph] -c:v libx264 -c:a aac.`);
+  log(`FFmpeg video filter graph: ${renderPlan.graph}`);
+  log(`FFmpeg arguments prepared: -ss ${safeTrimStart.toFixed(2)} -t ${safeTrimDuration.toFixed(2)} -vf [graph logged above] -c:v libx264 -c:a aac.`);
 
   let ffmpegStderr = "";
 

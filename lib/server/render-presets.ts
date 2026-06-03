@@ -10,7 +10,6 @@ type PresetEngineConfig = {
   colorFilters: string[];
   description: string;
   introText: string;
-  motionFilters: string[];
   outroText: string;
   titleFontColor: string;
 };
@@ -38,11 +37,6 @@ const stylePresets: Record<string, PresetEngineConfig> = {
     ],
     description: "color grade, slight contrast, slow zoom, fade transitions",
     introText: "CINEMATIC CUT",
-    motionFilters: [
-      "scale=trunc(iw*1.025/2)*2:trunc(ih*1.025/2)*2",
-      "crop=trunc(iw/1.025/2)*2:trunc(ih/1.025/2)*2",
-      "scale=iw:-2"
-    ],
     outroText: "MADE WITH AI",
     titleFontColor: "white"
   },
@@ -55,7 +49,6 @@ const stylePresets: Record<string, PresetEngineConfig> = {
     ],
     description: "fast cuts, beat-style pacing, punchy contrast, creator captions",
     introText: "WAIT FOR IT",
-    motionFilters: ["crop=iw-24:ih-24:12+8*sin(18*t):12+6*cos(14*t)", "scale=iw:-2"],
     outroText: "FOLLOW FOR MORE",
     titleFontColor: "0x20D9FF"
   },
@@ -68,11 +61,6 @@ const stylePresets: Record<string, PresetEngineConfig> = {
     ],
     description: "smooth pans, luxury color tone, elegant text overlays",
     introText: "SIGNATURE TOUR",
-    motionFilters: [
-      "scale=trunc(iw*1.018/2)*2:trunc(ih*1.018/2)*2",
-      "crop=trunc(iw/1.018/2)*2:trunc(ih/1.018/2)*2",
-      "scale=iw:-2"
-    ],
     outroText: "PRIVATE SHOWING",
     titleFontColor: "0x7CFFC4"
   },
@@ -85,11 +73,6 @@ const stylePresets: Record<string, PresetEngineConfig> = {
     ],
     description: "fast zooms, shake effects, impact cuts, phonk-style energy",
     introText: "IMPACT SYNC",
-    motionFilters: [
-      "crop=iw-36:ih-36:18+14*sin(24*t):18+10*cos(18*t)",
-      "scale=iw:-2",
-      "rotate=0.005*sin(22*t):fillcolor=black"
-    ],
     outroText: "CLUTCH MOMENT",
     titleFontColor: "0xB75CFF"
   },
@@ -103,11 +86,6 @@ const stylePresets: Record<string, PresetEngineConfig> = {
     ],
     description: "clean slow-motion feel, soft contrast, premium text style",
     introText: "LUMORA SELECT",
-    motionFilters: [
-      "scale=trunc(iw*1.015/2)*2:trunc(ih*1.015/2)*2",
-      "crop=trunc(iw/1.015/2)*2:trunc(ih/1.015/2)*2",
-      "scale=iw:-2"
-    ],
     outroText: "PREMIUM CUT",
     titleFontColor: "white"
   }
@@ -150,7 +128,6 @@ export function buildRenderPlan({
   const filters = [
     aspectSafeScale,
     "fps=30",
-    ...presetConfig.motionFilters,
     ...presetConfig.colorFilters,
     aspectSafeScale,
     "format=yuv420p",
