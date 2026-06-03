@@ -4,6 +4,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:render-geometry": "node --test test/render-geometry.test.mjs",
     "lint": "next lint"
   },
   "dependencies": {

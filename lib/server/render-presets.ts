@@ -1,4 +1,8 @@
 import { existsSync } from "node:fs";
+import {
+  buildAspectPreservingScaleFilter,
+  getBetaOutputBounds
+} from "@/lib/server/render-geometry";
 
 type PresetEngineConfig = {
   audioFilters: string[];
@@ -11,13 +15,16 @@ type PresetEngineConfig = {
   titleFontColor: string;
 };
 
-const betaSafeScale =
-  "scale='min(iw,720)':'min(ih,1280)':force_original_aspect_ratio=decrease";
-
 export type DrawtextFontInfo = {
   ffmpegPath: string;
   path: string;
   searchedPaths: string[];
+};
+
+export type SourceVideoDimensions = {
+  height: number;
+  rotation?: number;
+  width: number;
 };
 
 const stylePresets: Record<string, PresetEngineConfig> = {
@@ -122,6 +129,7 @@ export function buildRenderPlan({
   preset,
   prompt,
   quality,
+  sourceDimensions,
   trimDuration,
   watermark
 }: {
@@ -131,17 +139,20 @@ export function buildRenderPlan({
   preset: string;
   prompt: string;
   quality: string;
+  sourceDimensions: SourceVideoDimensions;
   trimDuration: number;
   watermark: boolean;
 }) {
   const presetConfig = resolvePresetConfig(preset, prompt);
   const fontFile = getFontFile(captionStyle);
+  const outputBounds = getBetaOutputBounds(sourceDimensions);
+  const aspectSafeScale = buildAspectPreservingScaleFilter(outputBounds);
   const filters = [
-    betaSafeScale,
+    aspectSafeScale,
     "fps=30",
     ...presetConfig.motionFilters,
     ...presetConfig.colorFilters,
-    betaSafeScale,
+    aspectSafeScale,
     "format=yuv420p",
     "fade=t=in:st=0:d=0.28",
     `fade=t=out:st=${Math.max(0, trimDuration - 0.35)}:d=0.35`,
@@ -163,7 +174,8 @@ export function buildRenderPlan({
   return {
     audioFilters: presetConfig.audioFilters,
     description: presetConfig.description,
-    graph: filters.join(",")
+    graph: filters.join(","),
+    outputBounds
   };
 }
 

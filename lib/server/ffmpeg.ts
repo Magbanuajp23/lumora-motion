@@ -8,6 +8,7 @@ import {
   getDrawtextFontInfo,
   normalizeCaptions
 } from "@/lib/server/render-presets";
+import { getAspectRatioLabel } from "@/lib/server/render-geometry";
 
 export type RenderEvent =
   | { type: "log"; message: string }
@@ -197,25 +198,6 @@ export async function getFfmpegHealth() {
   }
 }
 
-async function probeVideoDuration(inputPath: string, ffprobeCommand: string) {
-  const output = await runCommandWithOutput(ffprobeCommand, [
-    "-v",
-    "error",
-    "-show_entries",
-    "format=duration",
-    "-of",
-    "default=noprint_wrappers=1:nokey=1",
-    inputPath
-  ]);
-  const duration = Number(output);
-
-  if (!Number.isFinite(duration) || duration <= 0) {
-    throw new Error("FFprobe could not read a valid duration from the uploaded video.");
-  }
-
-  return duration;
-}
-
 async function probeAudioStreamCount(inputPath: string, ffprobeCommand: string) {
   const output = await runCommandWithOutput(ffprobeCommand, [
     "-v",
@@ -233,6 +215,56 @@ async function probeAudioStreamCount(inputPath: string, ffprobeCommand: string) 
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean).length;
+}
+
+type VideoProbeMetadata = {
+  duration: number;
+  height: number;
+  rotation: number;
+  width: number;
+};
+
+async function probeVideoMetadata(inputPath: string, ffprobeCommand: string): Promise<VideoProbeMetadata> {
+  const output = await runCommandWithOutput(ffprobeCommand, [
+    "-v",
+    "error",
+    "-select_streams",
+    "v:0",
+    "-show_entries",
+    "stream=width,height:stream_tags=rotate:stream_side_data=rotation:format=duration",
+    "-of",
+    "json",
+    inputPath
+  ]);
+  const metadata = JSON.parse(output) as {
+    format?: { duration?: string };
+    streams?: Array<{
+      height?: number;
+      side_data_list?: Array<{ rotation?: number }>;
+      tags?: { rotate?: string };
+      width?: number;
+    }>;
+  };
+  const stream = metadata.streams?.[0];
+  const duration = Number(metadata.format?.duration);
+  const width = Number(stream?.width);
+  const height = Number(stream?.height);
+  const rotation = Number(stream?.tags?.rotate ?? stream?.side_data_list?.find((item) => item.rotation !== undefined)?.rotation ?? 0);
+
+  if (!Number.isFinite(duration) || duration <= 0) {
+    throw new Error("FFprobe could not read a valid duration from the uploaded video.");
+  }
+
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+    throw new Error("FFprobe could not read a valid resolution from the uploaded video.");
+  }
+
+  return {
+    duration,
+    height,
+    rotation: Number.isFinite(rotation) ? rotation : 0,
+    width
+  };
 }
 
 function getErrorStderr(error: unknown) {
@@ -295,7 +327,8 @@ export async function renderWithFfmpeg({
     throw new Error("FFmpeg or FFprobe is not installed or is not available to Lumora Motion.");
   }
 
-  const uploadedDuration = await probeVideoDuration(inputPath, ffprobeCommand);
+  const videoMetadata = await probeVideoMetadata(inputPath, ffprobeCommand);
+  const uploadedDuration = videoMetadata.duration;
   const audioStreamCount = await probeAudioStreamCount(inputPath, ffprobeCommand);
   const safeTrimStart = Math.min(Math.max(trimStart, 0), Math.max(uploadedDuration - 0.5, 0));
   const remainingDuration = Math.max(uploadedDuration - safeTrimStart, 0.5);
@@ -334,9 +367,16 @@ export async function renderWithFfmpeg({
     preset,
     prompt,
     quality,
+    sourceDimensions: videoMetadata,
     trimDuration: safeTrimDuration,
     watermark
   });
+  log(
+    `Source resolution detected: ${videoMetadata.width}x${videoMetadata.height}${videoMetadata.rotation ? `, rotation ${videoMetadata.rotation}deg` : ""}.`
+  );
+  log(`Detected orientation: ${renderPlan.outputBounds.orientation}.`);
+  log(`Output resolution target: ${renderPlan.outputBounds.width}x${renderPlan.outputBounds.height}.`);
+  log(`Final aspect ratio target: ${renderPlan.outputBounds.aspectRatio}.`);
   const audioFilters =
     audioStreamCount > 0
       ? [
@@ -376,7 +416,7 @@ export async function renderWithFfmpeg({
   ];
 
   log(`FFmpeg render started using ${quality} output settings.`);
-  log("Beta render safety enabled: output is capped to 720x1280 and never upscaled above source dimensions.");
+  log("Beta render safety enabled: output is orientation-aware, capped for beta, and never upscaled above source dimensions.");
   log(`Applying ${preset} style engine: ${renderPlan.description}.`);
   log(watermark ? "Free-plan watermark overlay enabled." : "Watermark overlay disabled for paid demo export.");
   log(`FFmpeg arguments prepared: -ss ${safeTrimStart.toFixed(2)} -t ${safeTrimDuration.toFixed(2)} -vf [Lumora Motion filter graph] -c:v libx264 -c:a aac.`);
@@ -413,6 +453,9 @@ export async function renderWithFfmpeg({
     throw new Error("FFmpeg created an empty Lumora Motion output MP4.");
   }
 
+  const outputMetadata = await probeVideoMetadata(outputPath, ffprobeCommand);
+  log(`Rendered output resolution: ${outputMetadata.width}x${outputMetadata.height}.`);
+  log(`Rendered output aspect ratio: ${getAspectRatioLabel(outputMetadata)}.`);
   log(`Render complete. Output video is ready for download (${outputStats.size} bytes).`);
   onEvent({
     type: "complete",
