@@ -11,11 +11,8 @@ type PresetEngineConfig = {
   titleFontColor: string;
 };
 
-const qualityScale: Record<string, string> = {
-  "720p": "1280:-2",
-  "1080p": "1920:-2",
-  "4K Pro": "3840:-2"
-};
+const betaSafeScale =
+  "scale='min(iw,720)':'min(ih,1280)':force_original_aspect_ratio=decrease";
 
 export type DrawtextFontInfo = {
   ffmpegPath: string;
@@ -137,14 +134,14 @@ export function buildRenderPlan({
   trimDuration: number;
   watermark: boolean;
 }) {
-  const scale = qualityScale[quality] ?? qualityScale["1080p"];
   const presetConfig = resolvePresetConfig(preset, prompt);
   const fontFile = getFontFile(captionStyle);
   const filters = [
-    `scale=${scale}`,
+    betaSafeScale,
     "fps=30",
     ...presetConfig.motionFilters,
     ...presetConfig.colorFilters,
+    betaSafeScale,
     "format=yuv420p",
     "fade=t=in:st=0:d=0.28",
     `fade=t=out:st=${Math.max(0, trimDuration - 0.35)}:d=0.35`,

@@ -347,6 +347,8 @@ export async function renderWithFfmpeg({
       : [];
   const args = [
     "-y",
+    "-filter_threads",
+    "2",
     "-ss",
     String(safeTrimStart),
     "-t",
@@ -359,8 +361,10 @@ export async function renderWithFfmpeg({
     "libx264",
     "-preset",
     "veryfast",
+    "-threads",
+    "2",
     "-crf",
-    quality === "4K Pro" ? "20" : quality === "1080p" ? "24" : "26",
+    "26",
     ...(audioStreamCount > 0
       ? ["-af", audioFilters.join(","), "-c:a", "aac", "-b:a", "128k"]
       : ["-an"]),
@@ -372,6 +376,7 @@ export async function renderWithFfmpeg({
   ];
 
   log(`FFmpeg render started using ${quality} output settings.`);
+  log("Beta render safety enabled: output is capped to 720x1280 and never upscaled above source dimensions.");
   log(`Applying ${preset} style engine: ${renderPlan.description}.`);
   log(watermark ? "Free-plan watermark overlay enabled." : "Watermark overlay disabled for paid demo export.");
   log(`FFmpeg arguments prepared: -ss ${safeTrimStart.toFixed(2)} -t ${safeTrimDuration.toFixed(2)} -vf [Lumora Motion filter graph] -c:v libx264 -c:a aac.`);
