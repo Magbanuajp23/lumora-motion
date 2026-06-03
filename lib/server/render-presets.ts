@@ -17,6 +17,12 @@ const qualityScale: Record<string, string> = {
   "4K Pro": "3840:-2"
 };
 
+export type DrawtextFontInfo = {
+  ffmpegPath: string;
+  path: string;
+  searchedPaths: string[];
+};
+
 const stylePresets: Record<string, PresetEngineConfig> = {
   Cinematic: {
     audioFilters: [],
@@ -164,6 +170,34 @@ export function buildRenderPlan({
   };
 }
 
+export function getDrawtextFontInfo(captionStyle: string): DrawtextFontInfo {
+  if (process.platform === "win32") {
+    const fontName = captionStyle === "luxury-serif" ? "georgia.ttf" : "arial.ttf";
+    const path = `C:/Windows/Fonts/${fontName}`;
+    const exists = existsSync(path);
+    return {
+      ffmpegPath: exists ? `C\\:/Windows/Fonts/${fontName}` : "",
+      path: exists ? path : "",
+      searchedPaths: [path]
+    };
+  }
+
+  const searchedPaths = [
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "/Library/Fonts/Arial.ttf"
+  ];
+  const path = searchedPaths.find((candidate) => existsSync(candidate)) || "";
+
+  return {
+    ffmpegPath: path ? toFfmpegPath(path) : "",
+    path,
+    searchedPaths
+  };
+}
+
 function resolvePresetConfig(preset: string, prompt: string) {
   const promptText = prompt.toLowerCase();
 
@@ -196,19 +230,7 @@ function buildCaptionFilters(captionPath: string, captionStyle: string, fontFile
 }
 
 function getFontFile(captionStyle: string) {
-  if (process.platform === "win32") {
-    const fontName = captionStyle === "luxury-serif" ? "georgia.ttf" : "arial.ttf";
-    return `C\\:/Windows/Fonts/${fontName}`;
-  }
-
-  const candidates = [
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    "/System/Library/Fonts/Supplemental/Arial.ttf",
-    "/Library/Fonts/Arial.ttf"
-  ];
-
-  const font = candidates.find((candidate) => existsSync(candidate));
-  return font ? toFfmpegPath(font) : "";
+  return getDrawtextFontInfo(captionStyle).ffmpegPath;
 }
 
 function toFfmpegPath(path: string) {

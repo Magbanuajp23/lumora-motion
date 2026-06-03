@@ -3,13 +3,27 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { buildRenderPlan, normalizeCaptions } from "@/lib/server/render-presets";
+import {
+  buildRenderPlan,
+  getDrawtextFontInfo,
+  normalizeCaptions
+} from "@/lib/server/render-presets";
 
 export type RenderEvent =
   | { type: "log"; message: string }
   | { type: "progress"; progress: number; step: string }
   | { type: "complete"; outputUrl: string; jobId: string; logs: string[] }
-  | { type: "error"; message: string; logs: string[] };
+  | { type: "error"; message: string; logs: string[]; stderr?: string };
+
+class CommandError extends Error {
+  stderr: string;
+
+  constructor(message: string, stderr = "") {
+    super(message);
+    this.name = "CommandError";
+    this.stderr = stderr;
+  }
+}
 
 type RenderOptions = {
   captions: string;
@@ -69,7 +83,12 @@ function runCommand(command: string, args: string[], onStderr?: (chunk: string) 
     let stderr = "";
     const timeout = windowlessTimeout(() => {
       child.kill("SIGKILL");
-      reject(new Error(`Render timeout after ${Math.round(timeoutMs / 1000)} seconds.`));
+      reject(
+        new CommandError(
+          `Render timeout after ${Math.round(timeoutMs / 1000)} seconds.`,
+          stderr
+        )
+      );
     }, timeoutMs);
 
     child.stderr.on("data", (chunk: Buffer) => {
@@ -82,14 +101,15 @@ function runCommand(command: string, args: string[], onStderr?: (chunk: string) 
       clearTimeout(timeout);
       reject(error);
     });
-    child.on("close", (code) => {
+    child.on("close", (code, signal) => {
       clearTimeout(timeout);
       if (code === 0) {
         resolve();
         return;
       }
 
-      reject(new Error(stderr || `${command} exited with code ${code}`));
+      const exitSummary = `${command} exited with code ${code ?? "null"}${signal ? ` and signal ${signal}` : ""}.`;
+      reject(new CommandError(stderr ? `${stderr}\n${exitSummary}` : exitSummary, stderr));
     });
   });
 }
@@ -113,13 +133,14 @@ function runCommandWithOutput(command: string, args: string[]) {
     });
 
     child.on("error", (error) => reject(error));
-    child.on("close", (code) => {
+    child.on("close", (code, signal) => {
       if (code === 0) {
         resolve(stdout.trim());
         return;
       }
 
-      reject(new Error(stderr || `${command} exited with code ${code}`));
+      const exitSummary = `${command} exited with code ${code ?? "null"}${signal ? ` and signal ${signal}` : ""}.`;
+      reject(new CommandError(stderr ? `${stderr}\n${exitSummary}` : exitSummary, stderr));
     });
   });
 }
@@ -195,6 +216,30 @@ async function probeVideoDuration(inputPath: string, ffprobeCommand: string) {
   return duration;
 }
 
+async function probeAudioStreamCount(inputPath: string, ffprobeCommand: string) {
+  const output = await runCommandWithOutput(ffprobeCommand, [
+    "-v",
+    "error",
+    "-select_streams",
+    "a",
+    "-show_entries",
+    "stream=index",
+    "-of",
+    "csv=p=0",
+    inputPath
+  ]);
+
+  return output
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean).length;
+}
+
+function getErrorStderr(error: unknown) {
+  if (error instanceof CommandError) return error.stderr;
+  return "";
+}
+
 export async function renderWithFfmpeg({
   captions,
   captionStyle,
@@ -251,11 +296,16 @@ export async function renderWithFfmpeg({
   }
 
   const uploadedDuration = await probeVideoDuration(inputPath, ffprobeCommand);
+  const audioStreamCount = await probeAudioStreamCount(inputPath, ffprobeCommand);
   const safeTrimStart = Math.min(Math.max(trimStart, 0), Math.max(uploadedDuration - 0.5, 0));
   const remainingDuration = Math.max(uploadedDuration - safeTrimStart, 0.5);
   const safeTrimDuration = Math.min(Math.max(trimDuration, 0.5), remainingDuration);
 
   log(`Uploaded video duration detected: ${uploadedDuration.toFixed(2)}s.`);
+  log(`Audio stream validation: ${audioStreamCount} audio stream(s) detected.`);
+  if (audioStreamCount === 0) {
+    log("Missing audio stream detected. Lumora Motion will render video-only output and skip audio filters.");
+  }
   log(
     `Trim range selected: ${safeTrimStart.toFixed(2)}s start, ${safeTrimDuration.toFixed(2)}s duration.`
   );
@@ -263,6 +313,19 @@ export async function renderWithFfmpeg({
   if (safeTrimDuration < trimDuration || safeTrimStart !== trimStart) {
     log("Trim range was clamped to fit inside the uploaded video duration.");
   }
+
+  const fontInfo = getDrawtextFontInfo(captionStyle);
+  if (!fontInfo.path) {
+    throw new Error(
+      [
+        "Missing Linux font path for FFmpeg drawtext.",
+        "Lumora Motion could not find a usable font file for text overlays.",
+        `Searched paths: ${fontInfo.searchedPaths.join(", ")}`,
+        "Install a font package such as fonts-dejavu-core in the render container, or set the font resolver to an existing .ttf path."
+      ].join("\n")
+    );
+  }
+  log(`Drawtext font validation passed: ${fontInfo.path}.`);
 
   const renderPlan = buildRenderPlan({
     captionPath: normalizedCaptions ? captionPath : null,
@@ -274,11 +337,14 @@ export async function renderWithFfmpeg({
     trimDuration: safeTrimDuration,
     watermark
   });
-  const audioFilters = [
-    `afade=t=in:st=0:d=0.25`,
-    `afade=t=out:st=${Math.max(0, safeTrimDuration - 0.35)}:d=0.35`,
-    ...renderPlan.audioFilters
-  ];
+  const audioFilters =
+    audioStreamCount > 0
+      ? [
+          `afade=t=in:st=0:d=0.25`,
+          `afade=t=out:st=${Math.max(0, safeTrimDuration - 0.35)}:d=0.35`,
+          ...renderPlan.audioFilters
+        ]
+      : [];
   const args = [
     "-y",
     "-ss",
@@ -289,18 +355,15 @@ export async function renderWithFfmpeg({
     inputPath,
     "-vf",
     renderPlan.graph,
-    "-af",
-    audioFilters.join(","),
     "-c:v",
     "libx264",
     "-preset",
     "veryfast",
     "-crf",
     quality === "4K Pro" ? "20" : quality === "1080p" ? "24" : "26",
-    "-c:a",
-    "aac",
-    "-b:a",
-    "128k",
+    ...(audioStreamCount > 0
+      ? ["-af", audioFilters.join(","), "-c:a", "aac", "-b:a", "128k"]
+      : ["-an"]),
     "-pix_fmt",
     "yuv420p",
     "-movflags",
@@ -313,16 +376,28 @@ export async function renderWithFfmpeg({
   log(watermark ? "Free-plan watermark overlay enabled." : "Watermark overlay disabled for paid demo export.");
   log(`FFmpeg arguments prepared: -ss ${safeTrimStart.toFixed(2)} -t ${safeTrimDuration.toFixed(2)} -vf [Lumora Motion filter graph] -c:v libx264 -c:a aac.`);
 
-  await runCommand(ffmpegCommand, args, (chunk) => {
-    const parsed = parseProgress(chunk, safeTrimDuration);
-    if (parsed) {
-      onEvent({
-        type: "progress",
-        progress: parsed,
-        step: stepForProgress(parsed)
-      });
+  let ffmpegStderr = "";
+
+  try {
+    await runCommand(ffmpegCommand, args, (chunk) => {
+      ffmpegStderr += chunk;
+      const parsed = parseProgress(chunk, safeTrimDuration);
+      if (parsed) {
+        onEvent({
+          type: "progress",
+          progress: parsed,
+          step: stepForProgress(parsed)
+        });
+      }
+    }, 180000);
+  } catch (error) {
+    const stderr = getErrorStderr(error) || ffmpegStderr;
+    if (stderr) {
+      logs.push("FULL FFMPEG STDERR:");
+      logs.push(stderr);
     }
-  }, 180000);
+    throw error;
+  }
 
   if (!existsSync(outputPath)) {
     throw new Error("FFmpeg finished without creating the Lumora Motion output MP4.");

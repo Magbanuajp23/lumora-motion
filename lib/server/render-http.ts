@@ -68,7 +68,19 @@ export async function handleLocalRenderRequest(
         });
       } catch (error) {
         const message = error instanceof Error ? error.message : "Render failed.";
-        send({ type: "error", message, logs });
+        const failureLogs = [...logs];
+
+        if (message) {
+          failureLogs.push("FULL FFMPEG ERROR:");
+          failureLogs.push(message);
+        }
+
+        send({
+          type: "error",
+          message,
+          logs: failureLogs,
+          stderr: message
+        });
       } finally {
         controller.close();
       }

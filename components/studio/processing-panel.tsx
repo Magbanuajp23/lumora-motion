@@ -39,7 +39,7 @@ export function ProcessingPanel({
           />
         </div>
         {renderError ? (
-          <div className="mt-4 rounded-xl border border-rose-400/25 bg-rose-500/10 p-3 text-sm leading-6 text-rose-200">
+          <div className="mt-4 max-h-72 overflow-y-auto whitespace-pre-wrap break-words rounded-xl border border-rose-400/25 bg-rose-500/10 p-3 font-mono text-xs leading-5 text-rose-200 sm:text-sm sm:leading-6">
             {renderError}
           </div>
         ) : null}
@@ -74,7 +74,7 @@ export function ProcessingPanel({
         <div className="mt-3 max-h-44 space-y-2 overflow-y-auto pr-1 text-xs leading-5 text-slate-400">
           {renderLogs.length ? (
             renderLogs.map((log, index) => (
-              <div key={`${log}-${index}`} className="rounded-lg bg-white/[0.035] px-3 py-2">
+              <div key={`${log}-${index}`} className="whitespace-pre-wrap break-words rounded-lg bg-white/[0.035] px-3 py-2 font-mono">
                 {log}
               </div>
             ))

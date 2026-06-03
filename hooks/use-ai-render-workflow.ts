@@ -5,7 +5,7 @@ type RenderStreamEvent =
   | { type: "log"; message: string }
   | { type: "progress"; progress: number; step: string }
   | { type: "complete"; outputUrl?: string; downloadUrl?: string; jobId: string; logs: string[] }
-  | { type: "error"; message: string; logs: string[] };
+  | { type: "error"; message: string; logs: string[]; stderr?: string };
 
 type RenderStatusResponse = {
   directRenderUrl?: string | null;
@@ -218,7 +218,7 @@ export function useAiRenderWorkflow() {
             console.error("[Lumora Motion] Render worker returned an error", event);
             setRenderError(event.message);
             setRenderStatus("Render failed");
-            setRenderLogs(event.logs);
+            setRenderLogs(mergeFailureLogs(event.logs, event.message, event.stderr));
             setIsGenerating(false);
             return;
           }
@@ -226,8 +226,10 @@ export function useAiRenderWorkflow() {
       }
     } catch (error) {
       console.error("[Lumora Motion] Generate Edit failed", error);
-      setRenderError(error instanceof Error ? error.message : "Render failed.");
+      const message = error instanceof Error ? error.message : "Render failed.";
+      setRenderError(message);
       setRenderStatus("Render failed");
+      setRenderLogs((current) => mergeFailureLogs(current, message));
     } finally {
       setIsGenerating(false);
     }
@@ -248,6 +250,22 @@ export function useAiRenderWorkflow() {
     setComparison,
     setSelectedQuality
   };
+}
+
+function mergeFailureLogs(logs: string[], message: string, stderr?: string) {
+  const merged = [...logs];
+
+  if (stderr && !merged.includes(stderr)) {
+    merged.push("FULL FFMPEG STDERR:");
+    merged.push(stderr);
+  }
+
+  if (message && !merged.includes(message)) {
+    merged.push("FULL FFMPEG ERROR:");
+    merged.push(message);
+  }
+
+  return merged;
 }
 
 async function getRenderStatus(): Promise<RenderStatusResponse> {
