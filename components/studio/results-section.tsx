@@ -13,6 +13,7 @@ export function ResultsSection(props: {
   renderProgress: number;
   renderStatus: string;
   onQuality: (value: string) => void;
+  isLocked?: boolean;
 }) {
   const [previewError, setPreviewError] = useState("");
   const hasOutput = Boolean(props.outputUrl);
@@ -117,7 +118,7 @@ export function ResultsSection(props: {
               <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Export quality</p>
               <div className="mt-4 grid gap-2">
                 {renderQualities.map((quality) => (
-                  <button key={quality.label} onClick={() => props.onQuality(quality.label)} className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition duration-300 ${props.selectedQuality === quality.label ? "border-plasma/55 bg-plasma/10 text-white shadow-glow" : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/25"}`}>
+                  <button key={quality.label} onClick={() => props.onQuality(quality.label)} disabled={props.isLocked} className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${props.selectedQuality === quality.label ? "border-plasma/55 bg-plasma/10 text-white shadow-glow" : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/25"}`}>
                     <span className="font-bold">{quality.label}</span>
                     <span className="shrink-0 text-sm text-slate-400">{quality.time}</span>
                   </button>
@@ -135,11 +136,11 @@ export function ResultsSection(props: {
                 ) : null}
               </div>
               <a
-                href={props.outputUrl || undefined}
+                href={!props.isLocked && props.outputUrl ? props.outputUrl : undefined}
                 download
-                aria-disabled={!props.outputUrl}
+                aria-disabled={!props.outputUrl || props.isLocked}
                 className={`mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-black transition duration-300 ${
-                  props.outputUrl
+                  props.outputUrl && !props.isLocked
                     ? "bg-white text-[#05070d] hover:-translate-y-0.5 hover:bg-slate-200"
                     : "pointer-events-none border border-white/10 bg-white/[0.04] text-slate-500"
                 }`}
@@ -147,7 +148,7 @@ export function ResultsSection(props: {
                 <Download className="h-4 w-4" aria-hidden="true" />
                 Export / Download
               </a>
-              {props.outputUrl ? (
+              {props.outputUrl && !props.isLocked ? (
                 <a
                   href={props.outputUrl}
                   target="_blank"

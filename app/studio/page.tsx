@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Clapperboard, Sparkles } from "lucide-react";
 import { AuthRedirectNotice } from "@/components/auth/auth-redirect-notice";
 import { AppBackground } from "@/components/layout/app-background";
@@ -14,6 +14,7 @@ import { UploadPanel } from "@/components/studio/upload-panel";
 import { useAiRenderWorkflow } from "@/hooks/use-ai-render-workflow";
 import { useVideoUpload } from "@/hooks/use-video-upload";
 import { brand, presetPrompts, presets } from "@/lib/lumora-motion-data";
+import { getSupabaseClient } from "@/lib/supabase-client";
 
 export default function StudioPage() {
   const [selectedPreset, setSelectedPreset] = useState("Cinematic");
@@ -27,6 +28,8 @@ export default function StudioPage() {
   );
   const [captionStyle, setCaptionStyle] = useState("bold-white");
   const [showWatermark, setShowWatermark] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const upload = useVideoUpload();
   const render = useAiRenderWorkflow();
 
@@ -34,6 +37,41 @@ export default function StudioPage() {
     () => presets.find((preset) => preset.name === selectedPreset) ?? presets[0],
     [selectedPreset]
   );
+
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      window.location.replace("/#login");
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        window.location.replace("/#login");
+        return;
+      }
+
+      setIsLoggedIn(true);
+      setIsAuthChecking(false);
+    });
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        window.location.replace("/#login");
+        return;
+      }
+
+      setIsLoggedIn(true);
+      setIsAuthChecking(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const isStudioLocked = !isLoggedIn || isAuthChecking;
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-[#03050a] text-slate-100">
@@ -96,6 +134,7 @@ export default function StudioPage() {
               onFile={upload.handleVideoFile}
               onVideoMetadata={upload.handleVideoMetadata}
               onClear={upload.resetUpload}
+              isLocked={isStudioLocked}
             />
             <PromptPanel
               prompt={prompt}
@@ -103,23 +142,26 @@ export default function StudioPage() {
               captionStyle={captionStyle}
               selectedPreset={selectedPreset}
               isGenerating={render.isGenerating}
-              canGenerate={Boolean(upload.videoFile)}
+              canGenerate={Boolean(upload.videoFile) && !isStudioLocked}
+              isLocked={isStudioLocked}
               showWatermark={showWatermark}
               onPrompt={setPrompt}
               onCaptions={setCaptions}
               onCaptionStyle={setCaptionStyle}
               onWatermark={setShowWatermark}
               onGenerate={() =>
-                render.generateEdit({
-                  captionStyle,
-                  captions,
-                  file: upload.videoFile,
-                  preset: selectedPreset,
-                  prompt,
-                  showWatermark,
-                  trimDuration,
-                  trimStart
-                })
+                isStudioLocked
+                  ? undefined
+                  : render.generateEdit({
+                      captionStyle,
+                      captions,
+                      file: upload.videoFile,
+                      preset: selectedPreset,
+                      prompt,
+                      showWatermark,
+                      trimDuration,
+                      trimStart
+                    })
               }
               onTrimDuration={setTrimDuration}
               onTrimStart={setTrimStart}
@@ -154,6 +196,7 @@ export default function StudioPage() {
             renderProgress={render.renderProgress}
             renderStatus={render.renderStatus}
             onQuality={render.setSelectedQuality}
+            isLocked={isStudioLocked}
           />
         </div>
       </section>

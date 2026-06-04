@@ -1,5 +1,5 @@
 import type { DragEvent, RefObject } from "react";
-import { Film, Upload, Video } from "lucide-react";
+import { Film, LockKeyhole, Upload, Video } from "lucide-react";
 import type { UploadState } from "@/lib/types";
 import { formatDuration } from "@/lib/video";
 import { brand } from "@/lib/lumora-motion-data";
@@ -26,9 +26,13 @@ export function UploadPanel(props: {
   onFile: (file?: File) => void;
   onVideoMetadata: (duration: number, width: number, height: number) => void;
   onClear: () => void;
+  isLocked?: boolean;
 }) {
   const hasVideo = Boolean(props.videoUrl);
   const previewFrameClass = getPreviewFrameClass(props.videoMetadata.orientation);
+  const lockedDragHandler = (event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+  };
   const statusLabel =
     props.uploadState === "uploading"
       ? "uploading"
@@ -46,12 +50,17 @@ export function UploadPanel(props: {
         <Film className="h-6 w-6 text-plasma" aria-hidden="true" />
       </div>
       <label
-        onDragEnter={props.onDragEnter}
-        onDragOver={props.onDragOver}
-        onDragLeave={props.onDragLeave}
-        onDrop={props.onDrop}
-        className={`upload-zone group mt-6 flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-8 text-center transition duration-300 hover:-translate-y-1 hover:shadow-glow ${
-          props.isDragging ? "border-signal bg-signal/[0.12] shadow-glow" : "border-plasma/40 bg-plasma/[0.06] hover:border-plasma hover:bg-plasma/[0.11]"
+        onDragEnter={props.isLocked ? lockedDragHandler : props.onDragEnter}
+        onDragOver={props.isLocked ? lockedDragHandler : props.onDragOver}
+        onDragLeave={props.isLocked ? undefined : props.onDragLeave}
+        onDrop={props.isLocked ? lockedDragHandler : props.onDrop}
+        aria-disabled={props.isLocked}
+        className={`upload-zone group mt-6 flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-8 text-center transition duration-300 ${
+          props.isLocked
+            ? "cursor-not-allowed border-white/10 bg-white/[0.025] opacity-75"
+            : `cursor-pointer hover:-translate-y-1 hover:shadow-glow ${
+                props.isDragging ? "border-signal bg-signal/[0.12] shadow-glow" : "border-plasma/40 bg-plasma/[0.06] hover:border-plasma hover:bg-plasma/[0.11]"
+              }`
         }`}
       >
         {props.videoUrl ? (
@@ -85,13 +94,17 @@ export function UploadPanel(props: {
         ) : (
           <>
             <span className="relative grid h-16 w-16 place-items-center rounded-2xl border border-plasma/30 bg-black/30 text-plasma transition duration-300 group-hover:scale-105">
-              <Upload className="h-8 w-8" aria-hidden="true" />
+              {props.isLocked ? <LockKeyhole className="h-8 w-8" aria-hidden="true" /> : <Upload className="h-8 w-8" aria-hidden="true" />}
             </span>
-            <span className="mt-5 text-lg font-bold text-white">Drop footage into the editor</span>
-            <span className="mt-2 max-w-xs text-sm leading-6 text-slate-400">MP4, MOV, or WebM. {brand.name} detects scenes, pacing, dialogue, and visual style automatically.</span>
+            <span className="mt-5 text-lg font-bold text-white">{props.isLocked ? "Studio locked" : "Drop footage into the editor"}</span>
+            <span className="mt-2 max-w-xs text-sm leading-6 text-slate-400">
+              {props.isLocked
+                ? "Please log in to start editing. Uploads unlock after Supabase confirms your session."
+                : `MP4, MOV, or WebM. ${brand.name} detects scenes, pacing, dialogue, and visual style automatically.`}
+            </span>
           </>
         )}
-        <input ref={props.fileInputRef} type="file" accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm" className="sr-only" onChange={(event) => props.onFile(event.target.files?.[0])} />
+        <input ref={props.fileInputRef} type="file" accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm" className="sr-only" disabled={props.isLocked} onChange={(event) => props.onFile(event.target.files?.[0])} />
       </label>
       <div className="mt-4 rounded-xl border border-white/10 bg-black/25 p-4 text-sm text-slate-300">
         <div className="flex items-center justify-between gap-3">
@@ -116,7 +129,7 @@ export function UploadPanel(props: {
           </p>
         ) : null}
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-          <button type="button" onClick={() => props.fileInputRef.current?.click()} className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] text-sm font-semibold text-white transition duration-300 hover:border-plasma/40 hover:bg-plasma/10">
+          <button type="button" onClick={() => props.fileInputRef.current?.click()} disabled={props.isLocked} className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] text-sm font-semibold text-white transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 disabled:cursor-not-allowed disabled:opacity-50">
             <Upload className="h-4 w-4" aria-hidden="true" />
             Choose video
           </button>

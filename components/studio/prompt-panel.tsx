@@ -27,7 +27,8 @@ export function PromptPanel({
   showWatermark,
   trimDuration,
   trimStart,
-  canGenerate
+  canGenerate,
+  isLocked = false
 }: {
   prompt: string;
   captions: string;
@@ -46,7 +47,10 @@ export function PromptPanel({
   showWatermark: boolean;
   trimDuration: number;
   trimStart: number;
+  isLocked?: boolean;
 }) {
+  const canStartRender = canGenerate && !isGenerating && !isLocked;
+
   return (
     <div className="glass-panel min-w-0 rounded-2xl p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -56,15 +60,15 @@ export function PromptPanel({
         </div>
         <button
           onClick={onGenerate}
-          disabled={!canGenerate || isGenerating}
+          disabled={!canGenerate || isGenerating || isLocked}
           className={`inline-flex h-12 items-center justify-center gap-2 rounded-lg px-4 text-sm font-bold transition duration-300 ${
-            canGenerate && !isGenerating
+            canStartRender
               ? "bg-white text-[#05070d] hover:-translate-y-0.5 hover:bg-slate-200"
               : "cursor-not-allowed border border-white/10 bg-white/[0.045] text-slate-500"
           }`}
         >
           {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Sparkles className="h-4 w-4" aria-hidden="true" />}
-          {isGenerating ? "Generating" : canGenerate ? "Generate Edit" : "Upload video first"}
+          {isGenerating ? "Generating" : isLocked ? "Login required" : canGenerate ? "Generate Edit" : "Upload video first"}
         </button>
       </div>
       <div className="mt-6 rounded-3xl border border-plasma/15 bg-black/25 p-3 shadow-inner shadow-black/40 transition duration-300 focus-within:border-plasma/55 focus-within:shadow-glow">
@@ -81,7 +85,7 @@ export function PromptPanel({
             AI is ready to structure hook, pacing, captions, beat sync, and cinematic grade.
           </span>
         </div>
-        <textarea value={prompt} onChange={(event) => onPrompt(event.target.value)} rows={8} className="min-h-64 w-full resize-none bg-transparent p-3 text-base leading-7 text-slate-100 outline-none placeholder:text-slate-600 sm:min-h-72 sm:text-lg sm:leading-8" placeholder="Make this a viral TikTok edit with bold captions, fast pacing, and a strong final payoff..." />
+        <textarea value={prompt} onChange={(event) => onPrompt(event.target.value)} rows={8} disabled={isLocked} className="min-h-64 w-full resize-none bg-transparent p-3 text-base leading-7 text-slate-100 outline-none placeholder:text-slate-600 disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-72 sm:text-lg sm:leading-8" placeholder="Make this a viral TikTok edit with bold captions, fast pacing, and a strong final payoff..." />
       </div>
       <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-3">
         <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500">
@@ -90,7 +94,7 @@ export function PromptPanel({
         </div>
         <div className="prompt-marquee flex gap-2">
           {[...promptExamples, ...promptExamples].map((example, index) => (
-            <button key={`${example}-${index}`} onClick={() => onPrompt(example)} className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300 transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 hover:text-white">
+            <button key={`${example}-${index}`} onClick={() => onPrompt(example)} disabled={isLocked} className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300 transition duration-300 hover:border-plasma/40 hover:bg-plasma/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50">
               {example}
             </button>
           ))}
@@ -107,8 +111,9 @@ export function PromptPanel({
               min="0"
               max="30"
               value={trimStart}
+              disabled={isLocked}
               onChange={(event) => onTrimStart(Number(event.target.value))}
-              className="w-full accent-cyan-300"
+              className="w-full accent-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
             />
             <span className="w-12 text-right text-sm text-plasma">{trimStart}s</span>
           </div>
@@ -123,8 +128,9 @@ export function PromptPanel({
               min="3"
               max="60"
               value={trimDuration}
+              disabled={isLocked}
               onChange={(event) => onTrimDuration(Number(event.target.value))}
-              className="w-full accent-cyan-300"
+              className="w-full accent-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
             />
             <span className="w-12 text-right text-sm text-plasma">{trimDuration}s</span>
           </div>
@@ -140,8 +146,9 @@ export function PromptPanel({
             <input
               type="checkbox"
               checked={showWatermark}
+              disabled={isLocked}
               onChange={(event) => onWatermark(event.target.checked)}
-              className="accent-cyan-300"
+              className="accent-cyan-300 disabled:cursor-not-allowed"
             />
             Free watermark
           </label>
@@ -149,8 +156,9 @@ export function PromptPanel({
         <textarea
           value={captions}
           onChange={(event) => onCaptions(event.target.value)}
+          disabled={isLocked}
           rows={3}
-          className="mt-4 w-full resize-none rounded-2xl border border-white/10 bg-white/[0.035] p-3 text-sm leading-6 text-slate-100 outline-none transition duration-300 placeholder:text-slate-600 focus:border-plasma/45 focus:shadow-glow"
+          className="mt-4 w-full resize-none rounded-2xl border border-white/10 bg-white/[0.035] p-3 text-sm leading-6 text-slate-100 outline-none transition duration-300 placeholder:text-slate-600 focus:border-plasma/45 focus:shadow-glow disabled:cursor-not-allowed disabled:opacity-55"
           placeholder="Type captions to render into the video..."
         />
         <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
@@ -160,8 +168,9 @@ export function PromptPanel({
               <button
                 key={style.value}
                 type="button"
+                disabled={isLocked}
                 onClick={() => onCaptionStyle(style.value)}
-                className={`rounded-xl border p-3 text-left transition duration-300 hover:-translate-y-0.5 ${
+                className={`rounded-xl border p-3 text-left transition duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 ${
                   active
                     ? "border-plasma/55 bg-plasma/10 text-white shadow-glow"
                     : "border-white/10 bg-white/[0.035] text-slate-300 hover:border-white/25"
@@ -179,7 +188,7 @@ export function PromptPanel({
           const Icon = presetIcons[preset.icon as keyof typeof presetIcons];
           const active = selectedPreset === preset.name;
           return (
-            <button key={preset.name} onClick={() => onPreset(preset.name)} className={`group min-h-40 rounded-2xl border p-4 text-left transition duration-300 hover:-translate-y-1 ${active ? "border-plasma/60 bg-plasma/10 shadow-glow" : "border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06]"}`}>
+            <button key={preset.name} onClick={() => onPreset(preset.name)} disabled={isLocked} className={`group min-h-40 rounded-2xl border p-4 text-left transition duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50 ${active ? "border-plasma/60 bg-plasma/10 shadow-glow" : "border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06]"}`}>
               <div className={`grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${preset.accent} text-[#05070d] shadow-lg transition duration-300 group-hover:scale-105`}>
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </div>

@@ -38,6 +38,7 @@ export default function Home() {
   const [showWatermark, setShowWatermark] = useState(true);
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [hasConfirmedStudioUnlock, setHasConfirmedStudioUnlock] = useState(false);
   const upload = useVideoUpload();
   const render = useAiRenderWorkflow();
@@ -49,22 +50,28 @@ export default function Home() {
 
     const supabase = getSupabaseClient();
 
-    if (!supabase) return;
+    if (!supabase) {
+      setIsAuthChecking(false);
+      return;
+    }
 
     supabase.auth.getSession().then(({ data }) => {
       setIsLoggedIn(Boolean(data.session));
+      setIsAuthChecking(false);
     });
 
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsLoggedIn(Boolean(session));
+      setIsAuthChecking(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const shouldShowStudioWorkspace = isLoggedIn || hasConfirmedStudioUnlock;
+  const isStudioLocked = !isLoggedIn;
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-[#03050a] text-slate-100">
@@ -83,6 +90,24 @@ export default function Home() {
             title="Upload, prompt, render, export"
             copy={`Start with the core ${brand.name} workspace: drag in a video, choose a cinematic preset, describe the edit, and export an AI-assisted cut.`}
           />
+          {isStudioLocked ? (
+            <div className="relative mx-auto mb-6 max-w-3xl rounded-2xl border border-plasma/20 bg-black/45 p-5 text-center shadow-[0_0_40px_rgba(32,217,255,0.12)] backdrop-blur-2xl">
+              <p className="font-[var(--font-space)] text-xl font-black text-white">
+                Please log in to start editing.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                {isAuthChecking
+                  ? "Checking your Supabase session before unlocking uploads, rendering, and export."
+                  : "Your email is confirmed, but no active session is available yet. Log in to unlock uploads, AI rendering, and exports."}
+              </p>
+              <a
+                href="#login"
+                className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-black text-[#05070d] transition hover:-translate-y-0.5 hover:bg-slate-200"
+              >
+                Login
+              </a>
+            </div>
+          ) : null}
           <div className="relative mx-auto grid w-full max-w-7xl min-w-0 gap-6 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
             <UploadPanel
               fileName={upload.fileName}
@@ -105,6 +130,7 @@ export default function Home() {
               onFile={upload.handleVideoFile}
               onVideoMetadata={upload.handleVideoMetadata}
               onClear={upload.resetUpload}
+              isLocked={isStudioLocked}
             />
             <PromptPanel
               prompt={prompt}
@@ -112,23 +138,26 @@ export default function Home() {
               captionStyle={captionStyle}
               selectedPreset={selectedPreset}
               isGenerating={render.isGenerating}
-              canGenerate={Boolean(upload.videoFile)}
+              canGenerate={Boolean(upload.videoFile) && !isStudioLocked}
+              isLocked={isStudioLocked}
               showWatermark={showWatermark}
               onPrompt={setPrompt}
               onCaptions={setCaptions}
               onCaptionStyle={setCaptionStyle}
               onWatermark={setShowWatermark}
               onGenerate={() =>
-                render.generateEdit({
-                  captionStyle,
-                  captions,
-                  file: upload.videoFile,
-                  preset: selectedPreset,
-                  prompt,
-                  showWatermark,
-                  trimDuration,
-                  trimStart
-                })
+                isStudioLocked
+                  ? undefined
+                  : render.generateEdit({
+                      captionStyle,
+                      captions,
+                      file: upload.videoFile,
+                      preset: selectedPreset,
+                      prompt,
+                      showWatermark,
+                      trimDuration,
+                      trimStart
+                    })
               }
               onTrimDuration={setTrimDuration}
               onTrimStart={setTrimStart}
@@ -163,6 +192,7 @@ export default function Home() {
             renderProgress={render.renderProgress}
             renderStatus={render.renderStatus}
             onQuality={render.setSelectedQuality}
+            isLocked={isStudioLocked}
           />
         </section>
       ) : null}
