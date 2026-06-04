@@ -102,8 +102,13 @@ export default function ResetPasswordPage() {
     }
 
     setNewPassword("");
-    setSuccess("Password updated successfully. You can now log in with your new password.");
     setIsSubmitting(false);
+    setSuccess("Password updated successfully. Welcome back to Lumora Motion.");
+    await supabase.auth.getSession();
+
+    window.setTimeout(() => {
+      router.replace("/#studio");
+    }, 1400);
   }
 
   return (
@@ -135,14 +140,17 @@ export default function ResetPasswordPage() {
                       Password updated
                     </p>
                     <p className="mt-2 text-sm leading-6 text-signal">{success}</p>
+                    <p className="mt-2 text-xs leading-5 text-slate-400">
+                      Taking you back to the Studio workspace.
+                    </p>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => router.push("/#login")}
+                  onClick={() => router.replace("/#studio")}
                   className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-xl bg-white text-sm font-black text-[#05070d] transition hover:-translate-y-0.5 hover:bg-slate-200"
                 >
-                  Go to Login
+                  Go to Studio
                 </button>
               </div>
             ) : (
