@@ -9,6 +9,7 @@ import { getSupabaseClient, getSupabaseConfigError } from "@/lib/supabase-client
 
 type AuthMode = "login" | "signup";
 type AuthState = {
+  cta: "login" | "";
   error: string;
   loading: boolean;
   success: string;
@@ -27,8 +28,8 @@ export function AuthSection() {
     signup: false
   });
   const [authState, setAuthState] = useState<Record<AuthMode, AuthState>>({
-    login: { error: "", loading: false, success: "" },
-    signup: { error: "", loading: false, success: "" }
+    login: { cta: "", error: "", loading: false, success: "" },
+    signup: { cta: "", error: "", loading: false, success: "" }
   });
 
   function updateState(mode: AuthMode, next: Partial<AuthState>) {
@@ -46,7 +47,7 @@ export function AuthSection() {
     const supabase = getSupabaseClient();
 
     if (!supabase) {
-      updateState(mode, { error: getSupabaseConfigError(), loading: false, success: "" });
+      updateState(mode, { cta: "", error: getSupabaseConfigError(), loading: false, success: "" });
       return;
     }
 
@@ -55,11 +56,11 @@ export function AuthSection() {
     const password = String(formData.get("password") ?? "");
 
     if (!email || !password) {
-      updateState(mode, { error: "Enter both email and password.", loading: false, success: "" });
+      updateState(mode, { cta: "", error: "Enter both email and password.", loading: false, success: "" });
       return;
     }
 
-    updateState(mode, { error: "", loading: true, success: "" });
+    updateState(mode, { cta: "", error: "", loading: true, success: "" });
 
     const redirectTo = `${window.location.origin}/?confirmed=true#studio`;
     const result =
@@ -78,12 +79,35 @@ export function AuthSection() {
           });
 
     if (result.error) {
-      updateState(mode, { error: result.error.message, loading: false, success: "" });
+      updateState(mode, {
+        cta: mode === "signup" && isDuplicateSignupMessage(result.error.message) ? "login" : "",
+        error:
+          mode === "signup" && isDuplicateSignupMessage(result.error.message)
+            ? "This email is already registered. Please log in instead."
+            : result.error.message,
+        loading: false,
+        success: ""
+      });
+      return;
+    }
+
+    if (mode === "signup" && isDuplicateSignupResponse(result.data.user)) {
+      setEmailValues((current) => ({
+        ...current,
+        login: email
+      }));
+      updateState(mode, {
+        cta: "login",
+        error: "This email is already registered. Please log in instead.",
+        loading: false,
+        success: ""
+      });
       return;
     }
 
     if (mode === "signup" && !result.data.session) {
       updateState(mode, {
+        cta: "",
         error: "",
         loading: false,
         success: "Confirmation email sent. Open the Lumora Motion email and confirm your account to unlock the studio."
@@ -92,6 +116,7 @@ export function AuthSection() {
     }
 
     updateState(mode, {
+      cta: "",
       error: "",
       loading: false,
       success: mode === "login" ? "Logged in. Loading your workspace..." : "Account confirmed. Loading your workspace..."
@@ -103,7 +128,7 @@ export function AuthSection() {
     const supabase = getSupabaseClient();
 
     if (!supabase) {
-      updateState("login", { error: getSupabaseConfigError(), loading: false, success: "" });
+      updateState("login", { cta: "", error: getSupabaseConfigError(), loading: false, success: "" });
       return;
     }
 
@@ -112,24 +137,26 @@ export function AuthSection() {
     if (!email) {
       updateState("login", {
         error: "Enter your email first, then request a password reset.",
+        cta: "",
         loading: false,
         success: ""
       });
       return;
     }
 
-    updateState("login", { error: "", loading: true, success: "" });
+    updateState("login", { cta: "", error: "", loading: true, success: "" });
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: passwordResetRedirectUrl
     });
 
     if (error) {
-      updateState("login", { error: error.message, loading: false, success: "" });
+      updateState("login", { cta: "", error: error.message, loading: false, success: "" });
       return;
     }
 
     updateState("login", {
+      cta: "",
       error: "",
       loading: false,
       success: "Password reset link sent. Check your email."
@@ -140,11 +167,11 @@ export function AuthSection() {
     const supabase = getSupabaseClient();
 
     if (!supabase) {
-      updateState(mode, { error: getSupabaseConfigError(), loading: false, success: "" });
+      updateState(mode, { cta: "", error: getSupabaseConfigError(), loading: false, success: "" });
       return;
     }
 
-    updateState(mode, { error: "", loading: true, success: "" });
+    updateState(mode, { cta: "", error: "", loading: true, success: "" });
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -154,7 +181,7 @@ export function AuthSection() {
     });
 
     if (error) {
-      updateState(mode, { error: error.message, loading: false, success: "" });
+      updateState(mode, { cta: "", error: error.message, loading: false, success: "" });
     }
   }
 
@@ -229,6 +256,20 @@ export function AuthSection() {
             {state.error ? (
               <div className="mt-4 rounded-xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-200">
                 {state.error}
+                {state.cta === "login" ? (
+                  <a
+                    href="#login"
+                    onClick={() =>
+                      setEmailValues((current) => ({
+                        ...current,
+                        login: current.signup
+                      }))
+                    }
+                    className="mt-3 inline-flex h-10 items-center justify-center rounded-lg bg-white px-4 text-xs font-black text-[#05070d] transition hover:-translate-y-0.5 hover:bg-slate-200"
+                  >
+                    Go to Login
+                  </a>
+                ) : null}
               </div>
             ) : null}
             {state.success ? (
@@ -251,4 +292,12 @@ export function AuthSection() {
       </div>
     </section>
   );
+}
+
+function isDuplicateSignupMessage(message: string) {
+  return /already (registered|exists)|user already|email.*exists|email.*registered/i.test(message);
+}
+
+function isDuplicateSignupResponse(user: { identities?: unknown[] | null } | null) {
+  return Array.isArray(user?.identities) && user.identities.length === 0;
 }
