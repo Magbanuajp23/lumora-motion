@@ -61,7 +61,7 @@ export function AuthSection() {
 
     updateState(mode, { error: "", loading: true, success: "" });
 
-    const redirectTo = `${window.location.origin}/studio?auth=confirmed`;
+    const redirectTo = `${window.location.origin}/?auth=confirmed#studio`;
     const result =
       mode === "login"
         ? await supabase.auth.signInWithPassword({ email, password })

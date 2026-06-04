@@ -24,6 +24,8 @@ export function AuthRedirectNotice() {
       const error = params.get("error_description") ?? hash.get("error_description");
       const returnedWithSession = hash.has("access_token") || hash.has("refresh_token");
       const supabase = getSupabaseClient();
+      const shouldRouteConfirmedToHomeStudio =
+        authState === "confirmed" && window.location.pathname === "/studio";
 
       if (error) {
         if (isMounted) {
@@ -45,6 +47,11 @@ export function AuthRedirectNotice() {
             message: exchangeError.message
           });
         } else {
+          if (shouldRouteConfirmedToHomeStudio) {
+            window.location.replace("/?auth=confirmed#studio");
+            return;
+          }
+
           setNotice({
             tone: "success",
             title: authState === "google" ? "Signed in with Google" : "Lumora Motion studio unlocked",
@@ -55,6 +62,11 @@ export function AuthRedirectNotice() {
           });
         }
       } else if (authState === "confirmed" || returnedWithSession) {
+        if (shouldRouteConfirmedToHomeStudio) {
+          window.location.replace("/?auth=confirmed#studio");
+          return;
+        }
+
         if (isMounted) {
           setNotice({
             tone: "success",
@@ -74,7 +86,7 @@ export function AuthRedirectNotice() {
 
       if (authState || error || returnedWithSession || code) {
         await supabase?.auth.getSession();
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.hash}`);
       }
     }
 
