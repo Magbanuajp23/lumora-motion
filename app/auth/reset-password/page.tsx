@@ -101,9 +101,9 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setSuccess("Password updated. Redirecting to the studio...");
+    setNewPassword("");
+    setSuccess("Password updated successfully. You can now log in with your new password.");
     setIsSubmitting(false);
-    window.setTimeout(() => router.push("/studio"), 900);
   }
 
   return (
@@ -126,52 +126,68 @@ export default function ResetPasswordPage() {
               Create a new Lumora Motion password to get back into your AI editing studio.
             </p>
 
-            <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-              <label className="block rounded-xl border border-white/10 bg-black/25 px-4 py-3">
-                <span className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                  <LockKeyhole className="h-4 w-4" aria-hidden="true" />
-                  New password
-                </span>
-                <span className="mt-2 flex items-center gap-2">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    className="min-w-0 flex-1 bg-transparent text-white outline-none"
-                    placeholder="At least 8 characters"
-                    value={newPassword}
-                    onChange={(event) => setNewPassword(event.target.value)}
-                  />
-                  <button
-                    type="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    onClick={() => setShowPassword((current) => !current)}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold text-slate-300 transition hover:border-plasma/35 hover:bg-plasma/10 hover:text-white"
-                  >
-                    {showPassword ? <EyeOff className="h-3.5 w-3.5" aria-hidden="true" /> : <Eye className="h-3.5 w-3.5" aria-hidden="true" />}
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </span>
-              </label>
-
-              {error ? (
-                <div className="rounded-xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-200">
-                  {error}
+            {success ? (
+              <div className="mt-6 rounded-2xl border border-signal/25 bg-signal/10 p-5 shadow-[0_0_50px_rgba(111,255,203,0.12)]">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-signal" aria-hidden="true" />
+                  <div>
+                    <p className="font-[var(--font-space)] text-lg font-black text-white">
+                      Password updated
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-signal">{success}</p>
+                  </div>
                 </div>
-              ) : null}
-              {success ? (
-                <div className="rounded-xl border border-signal/25 bg-signal/10 px-4 py-3 text-sm leading-6 text-signal">
-                  {success}
-                </div>
-              ) : null}
+                <button
+                  type="button"
+                  onClick={() => router.push("/#login")}
+                  className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-xl bg-white text-sm font-black text-[#05070d] transition hover:-translate-y-0.5 hover:bg-slate-200"
+                >
+                  Go to Login
+                </button>
+              </div>
+            ) : (
+              <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+                <label className="block rounded-xl border border-white/10 bg-black/25 px-4 py-3">
+                  <span className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
+                    <LockKeyhole className="h-4 w-4" aria-hidden="true" />
+                    New password
+                  </span>
+                  <span className="mt-2 flex items-center gap-2">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      className="min-w-0 flex-1 bg-transparent text-white outline-none"
+                      placeholder="At least 8 characters"
+                      value={newPassword}
+                      onChange={(event) => setNewPassword(event.target.value)}
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowPassword((current) => !current)}
+                      className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold text-slate-300 transition hover:border-plasma/35 hover:bg-plasma/10 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="h-3.5 w-3.5" aria-hidden="true" /> : <Eye className="h-3.5 w-3.5" aria-hidden="true" />}
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </span>
+                </label>
 
-              <button
-                disabled={!isReady || isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-black text-[#05070d] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSubmitting || !isReady ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
-                {!isReady ? "Preparing secure session..." : isSubmitting ? "Updating password..." : "Update password"}
-              </button>
-            </form>
+                {error ? (
+                  <div className="rounded-xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-200">
+                    {error}
+                  </div>
+                ) : null}
+
+                <button
+                  disabled={!isReady || isSubmitting}
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-black text-[#05070d] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSubmitting || !isReady ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+                  {!isReady ? "Preparing secure session..." : isSubmitting ? "Updating password..." : "Update password"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
