@@ -38,10 +38,15 @@ export default function Home() {
   const [showWatermark, setShowWatermark] = useState(true);
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasConfirmedStudioUnlock, setHasConfirmedStudioUnlock] = useState(false);
   const upload = useVideoUpload();
   const render = useAiRenderWorkflow();
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const authState = params.get("auth");
+    setHasConfirmedStudioUnlock(params.get("confirmed") === "true" || authState === "confirmed");
+
     const supabase = getSupabaseClient();
 
     if (!supabase) return;
@@ -59,15 +64,17 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const shouldShowStudioWorkspace = isLoggedIn || hasConfirmedStudioUnlock;
+
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-[#03050a] text-slate-100">
       <AppBackground />
       <Navbar />
       <AuthRedirectNotice />
 
-      {isLoggedIn ? null : <HeroSection selectedPreset={selectedPreset} />}
+      {shouldShowStudioWorkspace ? null : <HeroSection selectedPreset={selectedPreset} />}
 
-      {isLoggedIn ? (
+      {shouldShowStudioWorkspace ? (
         <section id="studio" className="relative scroll-mt-24 overflow-hidden border-y border-white/10 bg-[#03050a]/80 px-4 py-16 sm:px-6 lg:px-8">
           <div className="particle-field pointer-events-none absolute inset-0 opacity-35" />
           <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-plasma/10 blur-3xl" />

@@ -20,12 +20,13 @@ export function AuthRedirectNotice() {
       const params = new URLSearchParams(window.location.search);
       const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const authState = params.get("auth");
+      const isConfirmed = params.get("confirmed") === "true" || authState === "confirmed";
       const code = params.get("code");
       const error = params.get("error_description") ?? hash.get("error_description");
       const returnedWithSession = hash.has("access_token") || hash.has("refresh_token");
       const supabase = getSupabaseClient();
       const shouldRouteConfirmedToHomeStudio =
-        authState === "confirmed" && window.location.pathname === "/studio";
+        isConfirmed && window.location.pathname === "/studio";
 
       if (error) {
         if (isMounted) {
@@ -48,7 +49,7 @@ export function AuthRedirectNotice() {
           });
         } else {
           if (shouldRouteConfirmedToHomeStudio) {
-            window.location.replace("/?auth=confirmed#studio");
+            window.location.replace("/?confirmed=true#studio");
             return;
           }
 
@@ -61,9 +62,9 @@ export function AuthRedirectNotice() {
                 : "Your email is confirmed. The editor is ready when your session finishes syncing."
           });
         }
-      } else if (authState === "confirmed" || returnedWithSession) {
+      } else if (isConfirmed || returnedWithSession) {
         if (shouldRouteConfirmedToHomeStudio) {
-          window.location.replace("/?auth=confirmed#studio");
+          window.location.replace("/?confirmed=true#studio");
           return;
         }
 
@@ -84,7 +85,7 @@ export function AuthRedirectNotice() {
         }
       }
 
-      if (authState || error || returnedWithSession || code) {
+      if (authState || isConfirmed || error || returnedWithSession || code) {
         await supabase?.auth.getSession();
         window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.hash}`);
       }
