@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Clapperboard, Sparkles } from "lucide-react";
+import { AuthRedirectNotice } from "@/components/auth/auth-redirect-notice";
 import { AppBackground } from "@/components/layout/app-background";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
@@ -38,6 +39,7 @@ export default function StudioPage() {
     <main className="relative min-h-screen w-full overflow-x-hidden bg-[#03050a] text-slate-100">
       <AppBackground />
       <Navbar />
+      <AuthRedirectNotice />
 
       <section id="studio" className="relative overflow-hidden px-4 py-10 sm:px-6 lg:px-8">
         <div className="particle-field pointer-events-none absolute inset-0 opacity-40" />

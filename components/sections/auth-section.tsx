@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Loader2, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SectionHeader } from "@/components/ui/section-header";
 import { brand } from "@/lib/lumora-motion-data";
@@ -14,8 +14,18 @@ type AuthState = {
   success: string;
 };
 
+const passwordResetRedirectUrl = "https://lumora-motion.vercel.app/auth/reset-password";
+
 export function AuthSection() {
   const router = useRouter();
+  const [emailValues, setEmailValues] = useState<Record<AuthMode, string>>({
+    login: "",
+    signup: ""
+  });
+  const [visiblePasswords, setVisiblePasswords] = useState<Record<AuthMode, boolean>>({
+    login: false,
+    signup: false
+  });
   const [authState, setAuthState] = useState<Record<AuthMode, AuthState>>({
     login: { error: "", loading: false, success: "" },
     signup: { error: "", loading: false, success: "" }
@@ -51,7 +61,7 @@ export function AuthSection() {
 
     updateState(mode, { error: "", loading: true, success: "" });
 
-    const redirectTo = `${window.location.origin}/?auth=confirmed`;
+    const redirectTo = `${window.location.origin}/studio?auth=confirmed`;
     const result =
       mode === "login"
         ? await supabase.auth.signInWithPassword({ email, password })
@@ -87,6 +97,43 @@ export function AuthSection() {
       success: mode === "login" ? "Logged in. Loading your workspace..." : "Account confirmed. Loading your workspace..."
     });
     router.push("/");
+  }
+
+  async function handleForgotPassword() {
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      updateState("login", { error: getSupabaseConfigError(), loading: false, success: "" });
+      return;
+    }
+
+    const email = emailValues.login.trim();
+
+    if (!email) {
+      updateState("login", {
+        error: "Enter your email first, then request a password reset.",
+        loading: false,
+        success: ""
+      });
+      return;
+    }
+
+    updateState("login", { error: "", loading: true, success: "" });
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: passwordResetRedirectUrl
+    });
+
+    if (error) {
+      updateState("login", { error: error.message, loading: false, success: "" });
+      return;
+    }
+
+    updateState("login", {
+      error: "",
+      loading: false,
+      success: "Password reset link sent. Check your email."
+    });
   }
 
   async function handleGoogleAuth(mode: AuthMode) {
@@ -127,12 +174,57 @@ export function AuthSection() {
             <div className="mt-6 space-y-3">
               <label className="block rounded-xl border border-white/10 bg-black/25 px-4 py-3">
                 <span className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500"><Mail className="h-4 w-4" />Email</span>
-                <input name="email" type="email" autoComplete="email" className="mt-2 w-full bg-transparent text-white outline-none" placeholder={brand.emailPlaceholder} />
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  className="mt-2 w-full bg-transparent text-white outline-none"
+                  placeholder={brand.emailPlaceholder}
+                  value={emailValues[id]}
+                  onChange={(event) =>
+                    setEmailValues((current) => ({
+                      ...current,
+                      [id]: event.target.value
+                    }))
+                  }
+                />
               </label>
               <label className="block rounded-xl border border-white/10 bg-black/25 px-4 py-3">
                 <span className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500"><Lock className="h-4 w-4" />Password</span>
-                <input name="password" type="password" autoComplete={id === "login" ? "current-password" : "new-password"} className="mt-2 w-full bg-transparent text-white outline-none" placeholder="Password" />
+                <span className="mt-2 flex items-center gap-2">
+                  <input
+                    name="password"
+                    type={visiblePasswords[id] ? "text" : "password"}
+                    autoComplete={id === "login" ? "current-password" : "new-password"}
+                    className="min-w-0 flex-1 bg-transparent text-white outline-none"
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    aria-label={visiblePasswords[id] ? "Hide password" : "Show password"}
+                    onClick={() =>
+                      setVisiblePasswords((current) => ({
+                        ...current,
+                        [id]: !current[id]
+                      }))
+                    }
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold text-slate-300 transition hover:border-plasma/35 hover:bg-plasma/10 hover:text-white"
+                  >
+                    {visiblePasswords[id] ? <EyeOff className="h-3.5 w-3.5" aria-hidden="true" /> : <Eye className="h-3.5 w-3.5" aria-hidden="true" />}
+                    {visiblePasswords[id] ? "Hide" : "Show"}
+                  </button>
+                </span>
               </label>
+              {id === "login" ? (
+                <button
+                  type="button"
+                  disabled={state.loading}
+                  onClick={handleForgotPassword}
+                  className="ml-auto block text-sm font-semibold text-plasma transition hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Forgot password?
+                </button>
+              ) : null}
             </div>
             {state.error ? (
               <div className="mt-4 rounded-xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-200">
