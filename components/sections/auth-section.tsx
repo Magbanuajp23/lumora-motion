@@ -27,6 +27,7 @@ export function AuthSection() {
     login: false,
     signup: false
   });
+  const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
   const [authState, setAuthState] = useState<Record<AuthMode, AuthState>>({
     login: { cta: "", error: "", loading: false, success: "" },
     signup: { cta: "", error: "", loading: false, success: "" }
@@ -54,9 +55,15 @@ export function AuthSection() {
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
+    const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (!email || !password) {
       updateState(mode, { cta: "", error: "Enter both email and password.", loading: false, success: "" });
+      return;
+    }
+
+    if (mode === "signup" && password !== confirmPassword) {
+      updateState(mode, { cta: "", error: "Passwords do not match.", loading: false, success: "" });
       return;
     }
 
@@ -242,6 +249,29 @@ export function AuthSection() {
                   </button>
                 </span>
               </label>
+              {id === "signup" ? (
+                <label className="block rounded-xl border border-white/10 bg-black/25 px-4 py-3">
+                  <span className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500"><Lock className="h-4 w-4" />Confirm Password</span>
+                  <span className="mt-2 flex items-center gap-2">
+                    <input
+                      name="confirmPassword"
+                      type={showSignupConfirmPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      className="min-w-0 flex-1 bg-transparent text-white outline-none"
+                      placeholder="Confirm password"
+                    />
+                    <button
+                      type="button"
+                      aria-label={showSignupConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                      onClick={() => setShowSignupConfirmPassword((current) => !current)}
+                      className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-bold text-slate-300 transition hover:border-plasma/35 hover:bg-plasma/10 hover:text-white"
+                    >
+                      {showSignupConfirmPassword ? <EyeOff className="h-3.5 w-3.5" aria-hidden="true" /> : <Eye className="h-3.5 w-3.5" aria-hidden="true" />}
+                      {showSignupConfirmPassword ? "Hide" : "Show"}
+                    </button>
+                  </span>
+                </label>
+              ) : null}
               {id === "login" ? (
                 <button
                   type="button"
